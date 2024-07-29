@@ -2,19 +2,19 @@
 import React, { Component } from 'react';
 import Cookies from 'js-cookie';
 
-export default class PhotoUpload extends Component {
+//export default class PhotoUpload extends Component {
+//    constructor(props) {
+//        super(props);
+//    };
 
-    constructor(props) {
-        super(props);
+//    render() {
+//    }
+//}
 
-       
-    };
-
-
-    
-
-    render() {
-
-        
-    }
+export default function PhotoUpload({ imageId, updateProfileData, savePhotoUrl }) {
+    return (
+        <div>
+            Your profile picture
+        </div>
+    )
 }

@@ -23,6 +23,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\js\react\ReactScripts\Profile\AccountProfile.1.jsx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\js\react\ReactScripts\Profile\AccountProfile.1.jsx" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.2" />
   </ItemGroup>
@@ -32,6 +40,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\js\react\ReactScripts\Profile\AccountProfile.1.jsx" />
     <None Include="wwwroot\util\NotificationFx\fonts\codropsicons\codropsicons.svg" />
     <None Include="wwwroot\util\NotificationFx\fonts\linecons\linecons.svg" />
     <None Include="wwwroot\util\NotificationFx\js\classie.js" />
