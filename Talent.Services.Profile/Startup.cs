@@ -76,8 +76,8 @@ namespace Talent.Services.Profile
                 {
                     builder.AllowAnyOrigin()
                     .AllowAnyMethod()
-                    .AllowAnyHeader()
-                    .AllowCredentials();
+                    .AllowAnyHeader();
+                    //.AllowCredentials();
                 });
             });
         }

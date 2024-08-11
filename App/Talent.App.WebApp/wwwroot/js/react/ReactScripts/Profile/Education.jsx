@@ -1,8 +1,9 @@
 ﻿/* Education section */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import { default as Countries } from '../../../../../wwwroot/util/jsonFiles/countries.json'
 import { ChildSingleInput } from '../Form/SingleInput.jsx';
+import { getApiCall, postApiCall } from './ApiUtil.jsx';
 
 //export default class Education extends React.Component {
 //    constructor(props) {
@@ -18,40 +19,53 @@ import { ChildSingleInput } from '../Form/SingleInput.jsx';
 //}
 
 export default function Education({ educationData, updateProfileData }) {
-    const tEduData = educationData.map((edu) => ({
-        country: edu.country,
-        instituteName: edu.instituteName,
-        title: edu.title,
-        degree: edu.degree,
-        YoG: edu.YoG,
-        editState: false        
-    }));
-    const [eduData, setEduData] = useState(tEduData);
+    
+    const [eduData, setEduData] = useState([]);
     const [eduForm, setEduForm] = useState(false);
 
+    useEffect(() => {
+        getApiCall(
+            'http://localhost:60290/profile/profile/getEducation',
+            setEduData
+        );
+    }, []);
+
+    const handleDelayCall = () => {
+        setTimeout(() => {
+            getApiCall(
+                'http://localhost:60290/profile/profile/getEducation',
+                setEduData
+            );
+        }, 500);
+    };
     const handleAddEduForm = () => {
         setEduForm(true);
     }
     const handleCancelEduForm = () => {
         setEduForm(false);
     }
-    const handleAddNewEduForm = (newCountry, newInstituteName, newTitle, newDegree, newYog) => {
-        const newEdu = [...eduData, {
+    const handleAddNewEduForm = (newCountry, newInstituteName, newTitle, newDegree, newYog) => {        
+        var addNewEdu = {
             country: newCountry,
             instituteName: newInstituteName,
             title: newTitle,
             degree: newDegree,
-            YoG: newYog,
-            editState: false
-        }];
-        setEduData(newEdu);
+            yearOfGraduation: parseInt(newYog)
+        }
+        postApiCall(
+            'http://localhost:60290/profile/profile/addEducation',
+            addNewEdu,
+            setEduData
+        )
+        //handleDelayCall();
     }
     const handleDeleteEdu = (index) => {
-        console.log(`deleteIndex: ${index}`)
-        let t = eduData[index];
-        const newEdu = [...eduData.slice(0, index), ...eduData.slice(index + 1)];
-        console.log(newEdu);
-        setEduData(newEdu);
+        let deleteEdu = eduData[index];
+        postApiCall(
+            'http://localhost:60290/profile/profile/deleteEducation',
+            deleteEdu,
+            setEduData
+        )                
     }
     const handleEditEdu = (indexEdit, state) => {
         const newEdu = eduData.map((item, index) => {
@@ -65,21 +79,19 @@ export default function Education({ educationData, updateProfileData }) {
         console.log(newEdu);
         setEduData(newEdu);
     }
-    const handleUpdateEdu = (updateIndex, newCountry, newInstitute, newTitle, newDegree, newGradYear) => {
-        const updateEdu = eduData.map((item, index) => {
-            if (index === updateIndex) {
-                var temp = item;
-                temp.country = newCountry;
-                temp.instituteName = newInstitute;
-                temp.title = newTitle;
-                temp.degree = newDegree;
-                temp.YoG = newGradYear;
-                temp.editState = false;
-                return temp;
-            }
-            return item;
-        });
-        setEduData(updateEdu);
+    const handleUpdateEdu = (updateIndex, newCountry, newInstitute, newTitle, newDegree, newGradYear) => {        
+        var eduToUpdate = eduData[updateIndex];
+        eduToUpdate.country = newCountry;
+        eduToUpdate.instituteName = newInstitute;
+        eduToUpdate.title = newTitle;
+        eduToUpdate.degree = newDegree;
+        eduToUpdate.yearOfGraduation = newGradYear;
+        console.log(`${eduToUpdate.country}, ${eduToUpdate.instituteName}, ${eduToUpdate.title}, ${eduToUpdate.degree}, ${eduToUpdate.yearOfGraduation}.`);
+        postApiCall(
+            'http://localhost:60290/profile/profile/updateEducation',
+            eduToUpdate,
+            setEduData
+        );        
     }
 
     return (        
@@ -92,42 +104,26 @@ export default function Education({ educationData, updateProfileData }) {
             }
             <EducationTableHeader handleAddEduForm={handleAddEduForm} />
             {eduData.map((edu, index) => {
-                if (edu.editState === false) {
-                    return (
-                        < EducationTable
-                            key={index}
-                            index={index}
-                            country={edu.country}
-                            instituteName={edu.instituteName}
-                            title={edu.title}
-                            degree={edu.degree}
-                            YoG={edu.YoG}
-                            editState={edu.editState}
-                            handleEditEdu={handleEditEdu}
-                            handleDeleteEdu={handleDeleteEdu}
-                        />
-                    )
-                } else {
-                    return (
-                        <UpdateEduForm
-                            index={index}
-                            country={edu.country}
-                            instituteName={edu.instituteName}
-                            title={edu.title}
-                            degree={edu.degree}
-                            YoG={edu.YoG}
-                            editState={edu.editState}
-                            handleUpdateEdu={handleUpdateEdu}
-                            handleCancelUpdate={handleEditEdu}
-                        />
-                    )
-                }
+                return (
+                    < EducationTable
+                        key={index}
+                        index={index}
+                        country={edu.country}
+                        instituteName={edu.instituteName}
+                        title={edu.title}
+                        degree={edu.degree}
+                        yearOfGraduation={edu.yearOfGraduation}                        
+                        handleEditEdu={handleEditEdu}
+                        handleDeleteEdu={handleDeleteEdu}
+                        handleUpdateEdu={handleUpdateEdu}
+                    />
+                )                
             }) }
         </div>
     )
 }
 
-function UpdateEduForm({ index, country, instituteName, title, degree, YoG, editState, handleUpdateEdu, handleCancelUpdate })
+function UpdateEduForm({ index, country, instituteName, title, degree, YoG, handleUpdateEdu, handleCancelUpdate })
 {
     const [newCountry, setNewCountry] = useState(country);
     const [newInstitute, setNewInstitute] = useState(instituteName);
@@ -137,14 +133,14 @@ function UpdateEduForm({ index, country, instituteName, title, degree, YoG, edit
 
     const handleUpdate = (e) => {
         e.preventDefault();
-        handleUpdateEdu(index, newCountry, newInstitute, newTitle, newDegree, newGradYear);
+        handleUpdateEdu(newCountry, newInstitute, newTitle, newDegree, newGradYear);
     }
     const handleCancel = (e) => {
         e.preventDefault();
-        handleCancelUpdate(index, false);
+        handleCancelUpdate();
     }
     return (
-        <div className='row'>
+        <div className='row' key={ index}>
             <div className='eight wide column'>
                 <ChildSingleInput
                     inputType="text"
@@ -233,15 +229,35 @@ function UpdateEduForm({ index, country, instituteName, title, degree, YoG, edit
         </div>
     )
 }
-function EducationTable({ index, country, instituteName, title, degree, YoG, editState, handleEditEdu, handleDeleteEdu }) {
+function EducationTable({ index, country, instituteName, title, degree, yearOfGraduation, handleEditEdu, handleDeleteEdu, handleUpdateEdu }) {
 
-    const handleEditEduClick = (e) => {
+    const [editState, setEditState] = useState(false);
+    
+    const handleEdit = (e) => {
         e.preventDefault();
-        handleEditEdu(index, true);
+        setEditState(true);
     }
-    const handleEduDeleteClick = () => {
-        //e.preventDefault();
+    const handleEduDeleteClick = (e) => {
+        e.preventDefault();
         handleDeleteEdu(index);
+    }
+    const handleUpdateEducationOK = (newCountry, newInstitute, newTitle, newDegree, newGradYear) => {
+        handleUpdateEdu(index, newCountry, newInstitute, newTitle, newDegree, newGradYear)
+        setEditState(false);
+    }
+    if (editState) {
+        return (
+            <UpdateEduForm
+                index={index}
+                country={country}
+                instituteName={instituteName}
+                title={title}
+                degree={degree}
+                YoG={yearOfGraduation}                
+                handleUpdateEdu={handleUpdateEducationOK}
+                handleCancelUpdate={ () => { setEditState(false) } }
+            />
+        )
     }
 
     return (
@@ -259,13 +275,13 @@ function EducationTable({ index, country, instituteName, title, degree, YoG, edi
                 {degree}
             </div>
             <div className='three wide column'>
-                {YoG}
+                {yearOfGraduation}
             </div>
             <div className='one wide column'>
                 <div className='row right floated'>
                     <i
                         className='pencil icon'
-                        onClick={ handleEditEduClick }
+                        onClick={ handleEdit }                        
                     >
                     </i>
                     <i

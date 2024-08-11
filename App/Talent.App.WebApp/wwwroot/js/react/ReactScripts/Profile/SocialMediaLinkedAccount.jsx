@@ -38,6 +38,8 @@ export default function SocialMediaLinkedAccount({ linkedAccounts, updateProfile
     const [accounts, setAccounts] = useState(linkedAccounts);
     const [edit, setEdit] = useState(false);
 
+    //console.log('linkedAccounts: ' + JSON.stringify(linkedAccounts));
+
     const setEditFunction = (state) => {
         setEdit(state);
     }

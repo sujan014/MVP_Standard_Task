@@ -1,6 +1,9 @@
 ﻿/* Language section */
 import React, { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
+import axios from 'axios';
+import { lang } from 'moment';
+import { getApiCall, postApiCall } from './ApiUtil.jsx';
 
 //export default class Language extends React.Component {
 //    constructor(props) {
@@ -36,26 +39,61 @@ const languageOptions = [
         text: 'Native/Bilingual'
     },
 ].map((x, index) => <option key={index} value={x.value}>{x.text}</option>);
-export default function Language({ languageData, updateProfileData }) {
-    const tLang = languageData.map((lang) => ({
-        name: lang.name,
-        level: lang.level,
-        editState: false
-    }));    
+
+const init = 0;
+const success = 1;
+const failure = 2;
+
+export default function Language({ languageData, updateProfileData, updateWithoutSave }) {
+    //var tLang = languageData.map((lang) => ({
+    //    id: lang.id,
+    //    currentUserId: lang.currentUserId,
+    //    name: lang.name,
+    //    level: lang.level,        
+    //}));
+    const [editProps, setEditProps] = useState([]);
     /*start from editing language level*/
 
-    const [languages, setLanguages] = useState(tLang);
-    
+    //const [languages, setLanguages] = useState(tLang);    
+    const [languages, setLanguages] = useState([]);    
     const [addNew, setAddNew] = useState(false);
-    const [languageEdit, setlanguageEdit] = useState(false);        
+    const [languageEdit, setlanguageEdit] = useState(false); 
+    const [postSuccess, setPostSuccess] = useState();
 
+    useEffect(() => {
+        //setLanguages(tLang);
+        getApiCall(
+            'http://localhost:60290/profile/profile/getLanguage',
+            setLanguages
+        );
+    },
+        //[tLang]
+        []
+    );        
+    const handleDelayCall = () => {
+        setTimeout(() => {
+            getApiCall(
+                'http://localhost:60290/profile/profile/getLanguage',
+                setLanguages
+            );
+        }, 500);
+    };
     const handleAddNewLanguage = (name, level) => {
         var temp = [...languages, {
             name:name,
             level: level,
             editState: false,
         }];
-        setLanguages(temp);        
+        // save language to database here
+        var newList = [...languageData, {
+            name: name,
+            level: level,
+        }];        
+        var profileData = {
+            languages : [...newList]
+        }
+        updateProfileData(profileData);
+        handleDelayCall();
     }
     const handleAddNewUI = (e) => {
         e.preventDefault();
@@ -64,13 +102,28 @@ export default function Language({ languageData, updateProfileData }) {
     const handleCancelNewUI = () => {
         setAddNew(false);
     }
-    const handleDeletelanguage = (index) => {
-        let t = languages[index];
+
+    const handleDeletelanguage = (index, languageId) => {
+        //let t = languages[index];
+        //var index = languages.findIndex(x => x.id === languageId);        
+        console.log(index);
         const newArray = [...languages.slice(0, index), ...languages.slice(index + 1)];
+        console.table(newArray);
         setLanguages(newArray);
+
+        // make API call here
+        console.log('languageid delete -> ' + languageId);
+        var languagetodelete = languages.filter(x => x.id === languageId)[0];
+        postApiCall(
+            'http://localhost:60290/profile/profile/DeleteLanguage',
+            languagetodelete,
+            setLanguages
+        );
     }
-    const handleEditLanguage = (indexEdit) => {        
-        const tempLangs = languages.map((todo, index) => {                        
+    
+    const handleEditLanguage = (indexEdit) => {
+        // This is no longer possible when the props are passed from the parent component.
+        const tempLang = languages.map((todo, index) => {                        
             if (index === indexEdit) {
                 const qw = todo;
                 qw.editState = true;
@@ -78,20 +131,37 @@ export default function Language({ languageData, updateProfileData }) {
             }
             return todo;
         });
-        setLanguages(tempLangs);
+        var profileData = {
+            languages: tempLang
+        }
+        updateWithoutSave(profileData);
+        //setLanguages(tempLangs);
     }
     const handleUpdateOk = (updateIndex, editLanguage, editLevel) => {
-        const updateLanguage = languages.map((oldLanguage, index) => {
+        console.log(`${updateIndex}, ${editLanguage}, ${editLevel}`);
+        var languageToUpdate = languages[updateIndex];
+        languageToUpdate.name = editLanguage;
+        languageToUpdate.level = editLevel;
+        
+        console.table(languageToUpdate);
+        postApiCall(
+            'http://localhost:60290/profile/profile/updateLanguage',
+            languageToUpdate,
+            setLanguages
+        );
+
+        /*
+        var updateLanguage = languages.map((langItem, index) => {
             if (index === updateIndex) {
-                const newLang = oldLanguage;
+                const newLang = langItem;
                 newLang.name = editLanguage;
                 newLang.level = editLevel;
-                newLang.editState = false;
                 return newLang;
             }
-            return oldLanguage;
+            return langItem;
         });
         setLanguages(updateLanguage);
+        */
     }
     const handleUpdateCancel = (indexEdit) => {        
         const newLangs = languages.map((lang, index) => {
@@ -128,32 +198,20 @@ export default function Language({ languageData, updateProfileData }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {languages.map((language, index) => {                            
-                            if (language.editState === false) {
-                                // Languages Default view
-                                return(
-                                    < DisplayLanguageTable
-                                        key={index}
-                                        index={index}
-                                        languageName={language.name}
-                                        languageLevel={language.level}
-                                        handleEditLanguage={handleEditLanguage}
-                                        handleDeletelanguage={handleDeletelanguage}
-                                    />
-                                )                                
-                            } else if (language.editState === true) {
-                                // Languages Edit view
-                                return(
-                                    < EditLanguageForm
-                                        key={index }
-                                        index={index}
-                                        languageName={language.name}
-                                        languageLevel={language.level}
-                                        handleUpdateOk={handleUpdateOk}
-                                        handleUpdateCancel={handleUpdateCancel}
-                                    />
-                                )                                
-                            }
+                        {languages.map((language, index) => {
+                            // Languages Default view
+                            return (
+                                < DisplayLanguageTable
+                                    key={index}
+                                    index={index}
+                                    languageId={language.id}
+                                    languageName={language.name}
+                                    languageLevel={language.level}
+                                    handleEditLanguage={handleEditLanguage}
+                                    handleDeletelanguage={handleDeletelanguage}
+                                    handleUpdateOk={handleUpdateOk }
+                                />
+                            )
                         })}
                     </tbody>
                 </table>
@@ -162,35 +220,57 @@ export default function Language({ languageData, updateProfileData }) {
     )
 }
 
-function DisplayLanguageTable({ index, languageName, languageLevel, handleEditLanguage, handleDeletelanguage }) {
+function DisplayLanguageTable({ index, languageId, languageName, languageLevel, handleEditLanguage, handleDeletelanguage, handleUpdateOk }) {
 
-    const handleEdit = () => {
-        handleEditLanguage(index);
+    const [editState, setEditState] = useState(false);
+
+    const handleEditForm = () => {
+        //handleEditLanguage(index);
+        setEditState(true);
     }
     const handleClose = () => {
-        handleDeletelanguage(index);
+        handleDeletelanguage(index, languageId);
+    }
+    const handleUpdateLanguage = (updateLanguage, updateLevel) => {
+        handleUpdateOk(index, updateLanguage, updateLevel);
+        setEditState(false);
     }
 
-    return (
-        <tr key={index}>
-            <td>{languageName}</td>
-            <td>{languageLevel}</td>
-            <td>
-                <div className='ui right floated'>
-                    <i
-                        className='pencil icon'
-                        onClick={handleEdit}
-                    >
-                    </i>
-                    <i
-                        className='close icon'
-                        onClick={handleClose}
-                    >
-                    </i>
-                </div>
-            </td>
-        </tr>
-    )
+    if (editState) {
+        return (
+            < EditLanguageForm
+                key={index}
+                index={index}
+                languageName={languageName}
+                languageLevel={languageLevel}
+                //handleUpdateOk={handleUpdateOk}
+                //handleUpdateCancel={handleUpdateCancel}
+                handleUpdateOk={handleUpdateLanguage}
+                handleUpdateCancel={() => { setEditState(false) } }
+            />
+        )
+    } else {
+        return (
+            <tr key={index}>
+                <td>{languageName}</td>
+                <td>{languageLevel}</td>
+                <td>
+                    <div className='ui right floated'>
+                        <i
+                            className='pencil icon'
+                            onClick={handleEditForm}
+                        >
+                        </i>
+                        <i
+                            className='close icon'
+                            onClick={handleClose}
+                        >
+                        </i>
+                    </div>
+                </td>
+            </tr>
+        )
+    }
 }
 
 function EditLanguageForm({ index, languageName, languageLevel, handleUpdateOk, handleUpdateCancel }) {
@@ -198,11 +278,12 @@ function EditLanguageForm({ index, languageName, languageLevel, handleUpdateOk, 
     const [editLevel, setEditLevel] = useState(languageLevel);
     const handleUpdate = (e) => {
         e.preventDefault();
-        handleUpdateOk(index, editLanguage, editLevel);
+        handleUpdateOk(editLanguage, editLevel);
     }
     const handleCancel = (e) => {
         e.preventDefault();
-        handleUpdateCancel(index);
+        handleUpdateCancel();
+        //handleUpdateCancel(index);
     }
     return (
         <tr key={index}>

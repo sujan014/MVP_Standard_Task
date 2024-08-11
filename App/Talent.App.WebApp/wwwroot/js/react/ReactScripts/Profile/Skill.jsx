@@ -1,6 +1,7 @@
 ﻿/* Skill section */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
+import { getApiCall, postApiCall } from './ApiUtil.jsx';
 
 //export default class Skill extends React.Component {
 //    constructor(props) {
@@ -33,37 +34,60 @@ const skillOptions = [
     },
 ].map((x, index) => <option key={index} value={x.value}>{x.text}</option>);
 
-export default function Skill({ skillData, updateAndSaveData }) {
-    const tskills = skillData.map((skill) => ({
-        name: skill.name,
-        level: skill.level,
-        editState: false
-    }));    
+export default function Skill({ skillData, updateProfileData, updateWithoutSave }) {    
 
-    const [skills, setSkills] = useState(tskills);
+    const [skills, setSkills] = useState([]);
     const [newSkill, setNewSkill] = useState('');
     const [newLevel, setNewLevel] = useState('');
     const [addNew, setAddNew] = useState(false);
-    
+
+    useEffect(() => {
+        getApiCall(
+            'http://localhost:60290/profile/profile/getSkill',
+            setSkills
+        );
+    },
+        []
+        //[tskills]
+    );
+    const handleDelayCall = () => {
+        setTimeout(() => {
+            getApiCall(
+                'http://localhost:60290/profile/profile/getSkill',
+                setSkills
+            );
+        }, 500);
+    };
     const handleAddNewUI = (e) => {
         e.preventDefault();
         setAddNew(true);
     }
-    const handleAddNewSkill = (newSkill, newLevel) => {
-        var tempSkills = [...skills, {
+    const handleAddNewSkill = (newSkill, newLevel) => {        
+        var newList = [...skillData, {
             name: newSkill,
-            level: newLevel,
-            editState: false
-        }]
-        setSkills(tempSkills);
+            level: newLevel
+        }];
+        var profileData = {
+            skills: [...newList]
+        }
+        updateProfileData(profileData);
+        handleDelayCall();
     }
     const handleCancelNewUI = () => {
         setAddNew(false);
     }
     const handleDeleteSkill = (index) => {
-        let t = skills[index];
+        let deleteSkill = skills[index];
         const newArray = [...skills.slice(0, index), ...skills.slice(index + 1)];
-        setSkills(newArray);
+        //setSkills(newArray);
+
+        // API call
+        console.log(`deleteSkill -> ${deleteSkill}`);
+        postApiCall(
+            'http://localhost:60290/profile/profile/deleteSkill',
+            deleteSkill,
+            setSkills
+        )
     }
     const handleEditSkill = (indexEdit) => {
         const tempSkills = skills.map((item, index) => {
@@ -77,7 +101,16 @@ export default function Skill({ skillData, updateAndSaveData }) {
         setSkills(tempSkills);
     }
     const handleUpdateOk = (editIndex, editSkill, editLevel) => {
-        var tempSkills = skills.map((oldSkill, index) => {
+        var skillToUpdate = skills[editIndex];
+        skillToUpdate.name = editSkill;
+        skillToUpdate.level = editLevel;
+        console.table(skillToUpdate);
+        postApiCall(
+            'http://localhost:60290/profile/profile/updateSkill',
+            skillToUpdate,
+            setSkills
+        );
+        /*var tempSkills = skills.map((oldSkill, index) => {
             if (index === editIndex) {
                 var updateSkill = oldSkill;
                 updateSkill.name = editSkill;
@@ -87,7 +120,7 @@ export default function Skill({ skillData, updateAndSaveData }) {
             }
             return oldSkill;
         });
-        setSkills(tempSkills);
+        setSkills(tempSkills);*/
     }
     const handleUpdateCancel = (indexEdit) => {
         const newSkills = skills.map((item, index) => {
@@ -126,7 +159,7 @@ export default function Skill({ skillData, updateAndSaveData }) {
                     </thead>
                     <tbody>
                         {skills.map((skill, index) => {
-                            if (skill.editState === false) {
+                            //if (skill.editState === false) {
                                 // Skills Default view
                                 return(
                                     < DisplaySkillTable
@@ -135,10 +168,11 @@ export default function Skill({ skillData, updateAndSaveData }) {
                                         skillName={skill.name}
                                         skillLevel={skill.level}
                                         handleEditSkill={ handleEditSkill }
-                                        handleDeleteSkill={ handleDeleteSkill }
+                                        handleDeleteSkill={handleDeleteSkill}
+                                        handleUpdateOk={handleUpdateOk}
                                     />
                                 )
-                            } else if (skill.editState === true) {
+                            /*} else if (skill.editState === true) {
                                 // Languages Edit view
                                 return (
                                     < EditSkillForm
@@ -150,7 +184,7 @@ export default function Skill({ skillData, updateAndSaveData }) {
                                         handleUpdateCancel={handleUpdateCancel}
                                     />
                                 )
-                            }
+                            }*/
                         })}
                     </tbody>
                 </table>
@@ -159,35 +193,57 @@ export default function Skill({ skillData, updateAndSaveData }) {
     )
 }
 
-function DisplaySkillTable({ index, skillName, skillLevel, handleEditSkill, handleDeleteSkill }) {
+function DisplaySkillTable({ index, skillName, skillLevel, handleEditSkill, handleDeleteSkill, handleUpdateOk }) {
+
+    const [editState, setEditState] = useState(false);
+
     const handleEdit = (e) => {
         e.preventDefault();
-        handleEditSkill(index);
+        //handleEditSkill(index);
+        setEditState(true);
     }
     const handleDelete = (e) => {
         e.preventDefault();
         handleDeleteSkill(index);
     }
-    return (
-        <tr key={index}>
-            <td>{skillName}</td>
-            <td>{skillLevel}</td>
-            <td>
-                <div className='ui right floated'>
-                    <i
-                        className='pencil icon'
-                        onClick={handleEdit}
-                    >
-                    </i>
-                    <i
-                        className='close icon'
-                        onClick={handleDelete}
-                    >
-                    </i>
-                </div>
-            </td>
-        </tr>
-    )
+    const handleUpdateSkills = (skillName, skillLevel) => {
+        handleUpdateOk(index, skillName, skillLevel);
+        setEditState(false);
+    }
+    if (editState) {
+        return (
+            < EditSkillForm
+                key={index}
+                index={index}
+                skillName={skillName}
+                skillLevel={skillLevel}
+                handleUpdateOk={handleUpdateSkills}
+                handleUpdateCancel={() => { setEditState(false) }}
+            />
+        )
+    }
+    else {
+        return (
+            <tr key={index}>
+                <td>{skillName}</td>
+                <td>{skillLevel}</td>
+                <td>
+                    <div className='ui right floated'>
+                        <i
+                            className='pencil icon'
+                            onClick={handleEdit}
+                        >
+                        </i>
+                        <i
+                            className='close icon'
+                            onClick={handleDelete}
+                        >
+                        </i>
+                    </div>
+                </td>
+            </tr>
+        )
+    }
 }
 function EditSkillForm({ index, skillName, skillLevel, handleUpdateOk, handleUpdateCancel }) {
     const [editSkill, setEditSkill] = useState(skillName);
@@ -195,12 +251,11 @@ function EditSkillForm({ index, skillName, skillLevel, handleUpdateOk, handleUpd
 
     const handleUpdate = (e) => {
         e.preventDefault();
-        handleUpdateOk(index, editSkill, editLevel);
-        handleUpdateCancel();
+        handleUpdateOk(editSkill, editLevel);        
     }
     const handleCancel = (e) => {
         e.preventDefault();
-        handleUpdateCancel(index);
+        handleUpdateCancel();
     }
     return (
         <tr key={index}>

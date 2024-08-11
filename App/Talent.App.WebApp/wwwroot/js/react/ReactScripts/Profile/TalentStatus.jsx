@@ -11,28 +11,31 @@ import { SingleInput } from '../Form/SingleInput.jsx';
 //}
 
 export default function TalentStatus({ status, updateProfileData, saveProfileData }) {
-    const [jobStatus, setJobStatus] = useState(status);
+    //const [jobStatus, setJobStatus] = useState(status);
+    var jobStatus = status.status;
+
     const onOptionSelect = (e) => {
+        var profileData = {
+            jobSeekingStatus: {
+                status: e.target.value
+            }
+        };
+        
+        updateProfileData(profileData);
 
-        var temp = jobStatus;
-        temp.status = e.target.value;
-        setJobStatus(temp);
-
-        //setJobStatus(prevState => ({
-        //    ...prevState,
-        //    status = e.target.value
-        //}
-        //));
-
-        //setJobStatus({
-        //    ...prevState,
-        //    status = e.target.value
-        //}
-        //);
-
-        console.log('status: ' + jobStatus.status);
+        //var temp = jobStatus;
+        //temp.status = e.target.value;
+        //setJobStatus(temp);                
     }
-
+    const handleSaveJobStatus = (e) => {
+        e.preventDefault();
+        //var profileData = {
+        //    jobSeekingStatus: {
+        //        status: 
+        //    }
+        //};
+        saveProfileData();
+    }
     return (
         <div className='ui grid sixteen wide column'>
             <div className='ui sixteen wide column'>
@@ -45,7 +48,8 @@ export default function TalentStatus({ status, updateProfileData, saveProfileDat
                                 name='Job Status'
                                 value='Actively looking for a job'
                                 id='Active'
-                                onChange={ onOptionSelect }
+                                onChange={onOptionSelect}
+                                checked={jobStatus === 'Actively looking for a job'}
                             />
                         </div>
                         <div className='fifteen wide column'>
@@ -60,6 +64,7 @@ export default function TalentStatus({ status, updateProfileData, saveProfileDat
                                 value='Not looking for a job at the moment'
                                 id='Inactive'
                                 onChange={onOptionSelect}
+                                checked={jobStatus === 'Not looking for a job at the moment'}
                                 />
                         </div>
                         <div className='fifteen wide column'>
@@ -74,6 +79,7 @@ export default function TalentStatus({ status, updateProfileData, saveProfileDat
                                 value='Currently employed but open to offers'
                                 id='Open'
                                 onChange={onOptionSelect}
+                                checked={jobStatus === 'Currently employed but open to offers'}
                                 />
                         </div>
                         <div className='fifteen wide column'>
@@ -88,6 +94,7 @@ export default function TalentStatus({ status, updateProfileData, saveProfileDat
                                 value='Will be available on later date'
                                 id='Closed'
                                 onChange={onOptionSelect}
+                                checked={jobStatus === 'Will be available on later date'}
                                 />
                         </div>
                         <div className='fifteen wide column'>
@@ -97,7 +104,11 @@ export default function TalentStatus({ status, updateProfileData, saveProfileDat
                 </div>
             </div>
             <div>
-                <button className='ui teal button'>Save
+                <button
+                    className='ui teal button'
+                    onClick = { handleSaveJobStatus }
+                >
+                    Save
                 </button>
             </div>
         </div>

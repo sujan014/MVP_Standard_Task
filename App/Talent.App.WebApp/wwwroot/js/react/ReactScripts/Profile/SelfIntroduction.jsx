@@ -1,5 +1,5 @@
 ﻿/* Self introduction section */
-import React, { Component, useState } from 'react';
+import React, { Component, useEffect, useState } from 'react';
 import Cookies from 'js-cookie'
 
 //export default class SelfIntroduction extends React.Component {
@@ -14,12 +14,30 @@ import Cookies from 'js-cookie'
 export default function SelfIntroduction({ summary, description, updateProfileData, updateWithoutSave }) {
     const [newSummary, setNewSummary] = useState(summary);
     const [newDescription, setNewDescription] = useState(description);
+
+    useEffect(() => {
+        if (summary) {
+            setNewSummary(summary);
+        }
+        if (description) {
+            setNewDescription(description);
+        }
+    }, [summary, description]);
     const handleSummary = (event) => {
         setNewSummary(event.target.value);
     }
     const handleDescription = (event) => {
         setNewDescription(event.target.value);
     }
+    const handleSaveData = (e) => {
+        e.preventDefault();
+        var profileData = {
+            summary: newSummary,
+            description: newDescription,
+        }
+        updateProfileData(profileData);
+    }
+
     return (
         <div className='ui grid sixteen wide column'>
             <div className='sixteen wide column'>
@@ -50,7 +68,11 @@ export default function SelfIntroduction({ summary, description, updateProfileDa
             <div className='sixteen wide column'>
                 <label>Description must be between 150-600 characters.</label>
             </div>
-            <button className='right floated ui teal button'>Save
+            <button
+                className='right floated ui teal button'
+                onClick={ handleSaveData }
+            >
+                Save
             </button>
         </div>
     )

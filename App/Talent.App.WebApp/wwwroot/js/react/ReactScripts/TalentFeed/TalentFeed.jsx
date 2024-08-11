@@ -45,7 +45,7 @@ export default class TalentFeed extends React.Component {
 
         return (
             <BodyWrapper reload={this.init} loaderData={this.state.loaderData}>
-                <div className="ui container">Your code goes here</div>
+                <div className="ui container">My code goes here</div>
             </BodyWrapper>
         )
     }

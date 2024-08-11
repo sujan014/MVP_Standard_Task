@@ -12,6 +12,10 @@ using Talent.Services.Profile.Models;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using Talent.Common.Security;
+using RawRabbit.Pipe.Middleware;
+using System.Reflection;
+using System.Numerics;
+using System.Xml.Linq;
 
 namespace Talent.Services.Profile.Domain.Services
 {
@@ -52,13 +56,111 @@ namespace Talent.Services.Profile.Domain.Services
         public async Task<TalentProfileViewModel> GetTalentProfile(string Id)
         {
             //Your code here;
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+
+            User profile = (await _userRepository.GetByIdAsync(Id));
+
+            var videoUrl = "";
+            var cvUrl = "";
+            if (profile != null)
+            {
+                var mappedLanguages = profile.Languages.Select(x => ViewModelFromLanguage(x)).ToList();
+                var mappedSkills = profile.Skills.Select(x => ViewModelFromSkill(x)).ToList();
+                var mappedEducation = profile.Education.Select(x => ViewModelFromEducation(x)).ToList();
+                var mappedCertification = profile.Certifications.Select(x => ViewModelFromCertification(x)).ToList();
+                var mappedExperience = profile.Experience.Select(x => ViewModelFromExperience(x)).ToList();
+
+                var result = new TalentProfileViewModel
+                {
+                    Id = profile.Id,
+                    FirstName = profile.FirstName,
+                    MiddleName = profile.MiddleName,
+                    LastName = profile.LastName,
+                    Gender = profile.Gender,
+                    Email = profile.Email,
+                    Phone = profile.Phone,
+                    MobilePhone = profile.MobilePhone,
+                    IsMobilePhoneVerified = profile.IsMobilePhoneVerified,
+                    Address = profile.Address,
+                    Nationality = profile.Nationality,
+                    VisaStatus = profile.VisaStatus,
+                    VisaExpiryDate = profile.VisaExpiryDate,
+                    ProfilePhoto = profile.ProfilePhoto,
+                    ProfilePhotoUrl = profile.ProfilePhotoUrl,
+                    VideoName = profile.VideoName,
+                    VideoUrl = videoUrl,// need to edit ???
+                    CvName = profile.CvName,
+                    CvUrl = cvUrl,  // need to edit ???
+                    Summary = profile.Summary,
+                    Description = profile.Description,
+                    LinkedAccounts = profile.LinkedAccounts,
+                    JobSeekingStatus = profile.JobSeekingStatus,
+                    Languages = mappedLanguages,
+                    Skills = mappedSkills,
+                    Education = mappedEducation,
+                    Certifications = mappedCertification,
+                    Experience = mappedExperience
+                };
+                return result;
+            }
+            return null;
         }
 
         public async Task<bool> UpdateTalentProfile(TalentProfileViewModel model, string updaterId)
         {
             //Your code here;
-            throw new NotImplementedException();
+            //throw new NotImplementedException();            
+            try
+            {
+                if (model.Id != null)
+                {
+                    User existingUser = await _userRepository.GetByIdAsync(model.Id);
+                    existingUser.FirstName = model.FirstName;
+                    existingUser.LastName = model.LastName;
+                    existingUser.Email = model.Email;
+                    existingUser.Phone = model.Phone;
+                    existingUser.LinkedAccounts = model.LinkedAccounts;
+                    existingUser.Address = model.Address;
+                    existingUser.Nationality = model.Nationality;
+                    existingUser.Summary = model.Summary;
+                    existingUser.Description = model.Description;
+                    existingUser.VisaStatus = model.VisaStatus;
+                    existingUser.VisaExpiryDate = model.VisaExpiryDate;
+                    existingUser.JobSeekingStatus = model.JobSeekingStatus;
+
+                    existingUser.Languages = model.Languages.Select(x => new UserLanguage {
+                        Id = ObjectId.GenerateNewId().ToString(),                        
+                        UserId = model.Id,
+                        Language = x.Name,
+                        LanguageLevel = x.Level
+                    }).ToList();
+                    
+                    existingUser.Skills = model.Skills.Select(x => new UserSkill
+                    {
+                        Id = ObjectId.GenerateNewId().ToString(),
+                        UserId = model.Id,
+                        Skill = x.Name,
+                        ExperienceLevel = x.Level
+                    }).ToList();
+
+                    existingUser.Education = model.Education.Select(x => new UserEducation
+                    {
+                        Id = ObjectId.GenerateNewId().ToString(),
+                        UserId = model.Id,
+                        Country = x.Country,
+                        InstituteName = x.InstituteName,
+                        Title = x.Title,
+                        Degree = x.Degree,
+                        YearOfGraduation = x.YearOfGraduation,
+                    }).ToList();
+                    await _userRepository.Update(existingUser);
+                }                
+            }
+            catch (MongoException ex)
+            {
+                return false;
+            }
+            return true;
         }
 
         public async Task<EmployerProfileViewModel> GetEmployerProfile(string Id, string role)
@@ -66,6 +168,8 @@ namespace Talent.Services.Profile.Domain.Services
 
             Employer profile = null;
             switch (role)
+
+
             {
                 case "employer":
                     profile = (await _employerRepository.GetByIdAsync(Id));
@@ -333,6 +437,50 @@ namespace Talent.Services.Profile.Domain.Services
             };
         }
 
+        protected AddLanguageViewModel ViewModelFromLanguage(UserLanguage language)
+        {
+            return new AddLanguageViewModel
+            {
+                Id = language.Id,
+                CurrentUserId = language.UserId,
+                Name = language.Language,
+                Level = language.LanguageLevel,
+            };
+        }
+        protected AddEducationViewModel ViewModelFromEducation(UserEducation education)
+        {
+            return new AddEducationViewModel
+            {
+                Id = education.Id,
+                Country = education.Country,
+                InstituteName = education.InstituteName,
+                Title = education.Title,
+                Degree = education.Degree,
+                YearOfGraduation = education.YearOfGraduation,
+            };
+        }
+        protected AddCertificationViewModel ViewModelFromCertification(UserCertification certification)
+        {
+            return new AddCertificationViewModel
+            {
+                Id = certification.Id,
+                CertificationName = certification.CertificationName,
+                CertificationFrom = certification.CertificationFrom,
+                CertificationYear = certification.CertificationYear,
+            };
+        }
+        protected ExperienceViewModel ViewModelFromExperience(UserExperience experience)
+        {
+            return new ExperienceViewModel 
+            {
+                Id = experience.Id,
+                Company = experience.Company,
+                Position = experience.Position,
+                Responsibilities = experience.Responsibilities,
+                Start = experience.Start,
+                End = experience.End,
+            };
+        }
         #endregion
 
         #endregion
