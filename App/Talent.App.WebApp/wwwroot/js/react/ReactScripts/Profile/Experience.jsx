@@ -6,34 +6,15 @@ import moment from 'moment';
 import DatePicker from 'react-datepicker';
 import { getApiCall, postApiCall } from './ApiUtil.jsx';
 
-//export default class Experience extends React.Component {
-//    constructor(props) {
-//        super(props);
-
-//    };
-
-//    render() {
-
-
-//    }
-//}
-
 export default function Experience({ experienceData, updateProfileData }) {
-    //const texper = experienceData.map((exper) => ({
-    //    company: exper.company,
-    //    position: exper.position,
-    //    duty: exper.duty,
-    //    startDate: exper.startDate,
-    //    endDate: exper.endDate,
-    //    //editState: false
-    //}));
-    //const [expernc, setExpernc] = useState(texper);
+    
     const [expernc, setExpernc] = useState([]);
     const [experiencForm, setExperienceForm] = useState(false);
 
     useEffect(() => {
         getApiCall(
-            'http://localhost:60290/profile/profile/getExperience',
+            //'http://localhost:60290/profile/profile/getExperience',
+            'https://module1talent-cnfucbdcave3ccgq.australiaeast-01.azurewebsites.net/profile/profile/getExperience',
             setExpernc
         );
     }, []);
@@ -51,39 +32,23 @@ export default function Experience({ experienceData, updateProfileData }) {
             start: new Date(newStartDate),
             end: new Date(newEndDate)
         }
-        console.log(`${addNewExp.company}, ${addNewExp.position}, ${addNewExp.responsibilities}, ${addNewExp.start}, ${addNewExp.end}`);
+        //console.log(`${addNewExp.company}, ${addNewExp.position}, ${addNewExp.responsibilities}, ${addNewExp.start}, ${addNewExp.end}`);
         postApiCall(
-            'http://localhost:60290/profile/profile/addExperience',
+            //'http://localhost:60290/profile/profile/addExperience',
+            'https://module1talent-cnfucbdcave3ccgq.australiaeast-01.azurewebsites.net/profile/profile/addExperience',
             addNewExp,
             setExpernc
         )               
     }
-    const handleAddExperience = () => {
-        let tt = newExper;
-        tt.company = e.target.value;
-        setNewExper(tt);
-    }
-    const handleEditExpnc = (indexEdit, state) => {
-        const newExprnc = expernc.map((item, index) => {
-            if (index === indexEdit) {
-                const qw = item;
-                qw.editState = state;
-                return qw;
-            }
-            return item;
-        });
-        setExpernc(newExprnc);
-    }
+    
     const handleDeleteExpnc = (index) => {
         let deleteExper = expernc[index];
         postApiCall(
-            'http://localhost:60290/profile/profile/deleteExperience',
+            //'http://localhost:60290/profile/profile/deleteExperience',
+            'https://module1talent-cnfucbdcave3ccgq.australiaeast-01.azurewebsites.net/profile/profile/deleteExperience',
             deleteExper,
             setExpernc
-        )
-        //let t = expernc[index];
-        //const newExpernc = [...expernc.slice(0, index), ...expernc.slice(index + 1)];
-        //setExpernc(newExpernc);
+        )        
     }
     const handleUpdateExpnc = (indexUpdate, companyUpdate, positionUpdate, responsibilitiesUpdate, startUpdate, endUpdate) => {
         var updateExper = expernc[indexUpdate];
@@ -94,25 +59,11 @@ export default function Experience({ experienceData, updateProfileData }) {
         updateExper.end = new Date(endUpdate);
 
         postApiCall(
-            'http://localhost:60290/profile/profile/updateExperience',
+            //'http://localhost:60290/profile/profile/updateExperience',
+            'https://module1talent-cnfucbdcave3ccgq.australiaeast-01.azurewebsites.net/profile/profile/updateExperience',
             updateExper,
             setExpernc
-        )
-
-        //const newExprnc = expernc.map((item, index) => {
-        //    if (index === indexUpdate) {
-        //        const qw = item;
-        //        qw.company = company;
-        //        qw.position = position;
-        //        qw.responsibilities = responsibilities;
-        //        qw.startDate = startDate.format('DD/MM/YYYY');
-        //        qw.endDate = endDate.format('DD/MM/YYYY');
-        //        qw.editState = false;
-        //        return qw;
-        //    }
-        //    return item;
-        //});
-        //setExpernc(newExprnc);
+        )        
     }
     return (
         <div className='ui grid sixteen column wide'>
@@ -137,21 +88,7 @@ export default function Experience({ experienceData, updateProfileData }) {
                         DeleteData={handleDeleteExpnc}
                         updateData={handleUpdateExpnc}
                     />
-                    )
-                    //return (
-                    //    <UpdateExperienceForm
-                    //        key={index}
-                    //        company={exp.company}
-                    //        position={exp.position}
-                    //        duty={exp.duty}
-                    //        startDate={exp.startDate}
-                    //        endDate={exp.endDate}
-                    //        editState={exp.editState}
-                    //        updateData={handleUpdateExpnc}
-                    //        cancelData={handleEditExpnc}
-                    //        index={index}
-                    //    />
-                    //)                
+                )                    
             })}                         
         </div>
     )
@@ -191,7 +128,7 @@ function ExperienceTableHeader({ handleAddNewForm }) {
     )
 }
 function ExperienceTable({ index, company, position, responsibilities, start, end, DeleteData, updateData }) {
-    console.log(company + ', ' + position + ', ' + responsibilities + ', ' + start + ', ' + end);
+    
     const [edit, setEdit] = useState(false);
 
     const handleEditClick = (e) => {
@@ -342,7 +279,7 @@ function UpdateExperienceForm({ index, company, position, responsibilities, star
                         className='ui teal button'
                         onClick={handleUpdate}
                     >
-                        Add
+                        Update
                     </button>
                     <button
                         className='ui primary basic button'
@@ -358,9 +295,7 @@ function UpdateExperienceForm({ index, company, position, responsibilities, star
 function AddExperienceForm({ handleAddNewExperience, handleCancelNewForm }) {
     const [newCompany, setNewCompany] = useState('');
     const [newPosition, setNewPosition] = useState('');
-    const [newResponsibilities, setNewResponsibilities] = useState('');
-    //const [newStart, setNewStart] = useState(null);
-    //const [newEnd, setNewEnd] = useState(null);    
+    const [newResponsibilities, setNewResponsibilities] = useState('');    
     const [newStart, setNewStart] = useState(moment());
     const [newEnd, setNewEnd] = useState(moment());    
 
@@ -416,7 +351,6 @@ function AddExperienceForm({ handleAddNewExperience, handleCancelNewForm }) {
                     <label>Start date</label>
                     <DatePicker
                         selected={newStart}
-                        //onChange={(date) => setNewStart(date)}
                         onChange={handleStartDate }
                         formatDate="dd/MM/yyy"
                         //minDate={moment()}
@@ -428,7 +362,6 @@ function AddExperienceForm({ handleAddNewExperience, handleCancelNewForm }) {
                     <label>End date</label>
                     <DatePicker
                         selected={newEnd}
-                        //onChange={(date) => setNewEnd(date)}
                         onChange={handleEndDate}
                         formatDate="dd/MM/yyy"
                         //minDate={moment()}

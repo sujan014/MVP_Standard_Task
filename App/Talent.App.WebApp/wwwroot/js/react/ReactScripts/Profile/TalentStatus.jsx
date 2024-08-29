@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react'
+﻿import React, { useEffect, useState } from 'react'
 import { Form, Checkbox } from 'semantic-ui-react';
 import { SingleInput } from '../Form/SingleInput.jsx';
 
@@ -11,30 +11,27 @@ import { SingleInput } from '../Form/SingleInput.jsx';
 //}
 
 export default function TalentStatus({ status, updateProfileData, saveProfileData }) {
-    //const [jobStatus, setJobStatus] = useState(status);
-    var jobStatus = status.status;
+    // This is not working now.
+    const [jobStatus, setJobStatus] = useState('');
+    
+    useEffect(() => {
+        setJobStatus(status.status);
+    }, [status]);
+    var checkStatus = status.status;
 
-    const onOptionSelect = (e) => {
-        var profileData = {
-            jobSeekingStatus: {
-                status: e.target.value
-            }
-        };
-        
-        updateProfileData(profileData);
-
-        //var temp = jobStatus;
-        //temp.status = e.target.value;
-        //setJobStatus(temp);                
+    const onOptionSelect = (e) => {        
+        //e.preventDefault();        
+        checkStatus = e.target.value;
+        setJobStatus(e.target.value);
     }
     const handleSaveJobStatus = (e) => {
         e.preventDefault();
-        //var profileData = {
-        //    jobSeekingStatus: {
-        //        status: 
-        //    }
-        //};
-        saveProfileData();
+        var profileData = {
+            jobSeekingStatus: {
+                status: jobStatus
+            }
+        };
+        saveProfileData(profileData);
     }
     return (
         <div className='ui grid sixteen wide column'>

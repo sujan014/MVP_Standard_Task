@@ -2,7 +2,6 @@
 import axios from 'axios';
 
 const getApiCall = (url, callbackUseState) => {
-
     var cookies = Cookies.get('talentAuthToken');
     axios
         .get(
@@ -15,36 +14,20 @@ const getApiCall = (url, callbackUseState) => {
             }
         )
         .then((response) => {
-            console.log('response');
-            console.log(response);
-            if (response.status === 200) {
-                //TalentUtil.notification.show("Language updated sucessfully", "success", null, null);
-                var tempData = response.data.data;
-                //console.table(tempData);
-                //var mapData = tempData.map((lang) => ({
-                //    id: lang.id,
-                //    currentUserId: lang.currentUserId,
-                //    name: lang.name,
-                //    level: lang.level,
-                //    //editState: false
-                //}));
-                console.log('API CALL DATA');
-                console.table(tempData);
+            if (response.status === 200) {                
+                var tempData = response.data.data;                                                                
                 callbackUseState(tempData);
-            } else {
-                console.log('Get Language unsuccessful');
-                //TalentUtil.notification.show("Language update unsuccessfull", "error", null, null);
+            } else {                
+                TalentUtil.notification.show(`Error Status: ${response.status}`, "error", null, null);
             }
         })
-        .catch(error => {
-            console.log('error: ' + error);
-            TalentUtil.notification.show("Error getting language", "error", null, null);
+        .catch(error => {            
+            TalentUtil.notification.show("Error getting data", "error", null, null);
         })
 }
 
 const postApiCall = (url, data, callbackUseState) => {
-    console.table(data);
-
+    //console.table(data);
     var cookies = Cookies.get('talentAuthToken');
     axios
         .post(
@@ -57,25 +40,50 @@ const postApiCall = (url, data, callbackUseState) => {
                 }
             }
         )
-        .then((response) => {
-            console.log('response');
-            console.log(response);
+        .then((response) => {            
             if (response.status === 200) {
-                TalentUtil.notification.show("Language updated sucessfully", "success", null, null);
                 var tempData = response.data.data;
-                console.table(tempData);                
-                callbackUseState(tempData);
-                //setLanguages(mapData);
-                // to update the values, reloaded value must be passed to the state in the parent component.
-                // It cannot be directly changed from the child component.
+                TalentUtil.notification.show("Data updated sucessfully", "success", null, null);
+                callbackUseState(tempData);                                
             } else {
-                TalentUtil.notification.show("Language update unsuccessfull", "error", null, null);
+                TalentUtil.notification.show(`Error Status: ${response.status}`, "error", null, null);
             }
         })
-        .catch(error => {
-            console.log('error: ' + error);
-            TalentUtil.notification.show("Error updating language", "error", null, null);
+        .catch(error => {            
+            TalentUtil.notification.show("Error updating data", "error", null, null);
         })
 }
 
-export { getApiCall, postApiCall };
+const savePhoto = (url, file) => {
+    var cookies = Cookies.get('talentAuthToken');
+    var formData = new FormData();
+    formData.append("file", file, file.name);
+
+    axios
+        .post(
+            url,    //savePhotoUrl,
+            formData,
+            {
+                headers: {
+                    'authorization': 'bearer ' + cookies,
+                    'content-type': 'multipart/form-data'
+                }
+            }
+        )
+        .then((response) => {
+            if (response.status === 200) {
+                if (response.data.success) {
+                    TalentUtil.notification.show("Profile photo updated sucessfully", "success", null, null);
+                }
+                else {
+                    TalentUtil.notification.show("Profile photo update unsuccessfull", "error", null, null);
+                }
+            } else {
+                TalentUtil.notification.show("Profile photo update unsuccessfull", "error", null, null);
+            }
+        })
+        .catch((error) => {
+            TalentUtil.notification.show("Profile photo update unsuccessfull. Axios post error", "error", null, null);
+        })
+}
+export { getApiCall, postApiCall, savePhoto };

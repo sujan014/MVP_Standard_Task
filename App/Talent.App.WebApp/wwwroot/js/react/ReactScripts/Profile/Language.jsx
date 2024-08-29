@@ -5,18 +5,6 @@ import axios from 'axios';
 import { lang } from 'moment';
 import { getApiCall, postApiCall } from './ApiUtil.jsx';
 
-//export default class Language extends React.Component {
-//    constructor(props) {
-//        super(props);
-
-
-//    }
-
-//    render() {
-
-//    }
-//}
-
 const languageOptions = [
     {
         value: '',
@@ -44,57 +32,41 @@ const init = 0;
 const success = 1;
 const failure = 2;
 
-export default function Language({ languageData, updateProfileData, updateWithoutSave }) {
-    //var tLang = languageData.map((lang) => ({
-    //    id: lang.id,
-    //    currentUserId: lang.currentUserId,
-    //    name: lang.name,
-    //    level: lang.level,        
-    //}));
-    const [editProps, setEditProps] = useState([]);
-    /*start from editing language level*/
-
-    //const [languages, setLanguages] = useState(tLang);    
+export default function Language({ languageData, updateProfileData, updateWithoutSave }) {    
+    const [editProps, setEditProps] = useState([]);    
     const [languages, setLanguages] = useState([]);    
-    const [addNew, setAddNew] = useState(false);
-    const [languageEdit, setlanguageEdit] = useState(false); 
-    const [postSuccess, setPostSuccess] = useState();
+    const [addNew, setAddNew] = useState(false);    
 
     useEffect(() => {
-        //setLanguages(tLang);
         getApiCall(
-            'http://localhost:60290/profile/profile/getLanguage',
+            //'http://localhost:60290/profile/profile/getLanguage',
+            'https://module1talent-cnfucbdcave3ccgq.australiaeast-01.azurewebsites.net/profile/profile/getLanguage',
             setLanguages
         );
-    },
-        //[tLang]
-        []
-    );        
+    }, []);
     const handleDelayCall = () => {
         setTimeout(() => {
             getApiCall(
-                'http://localhost:60290/profile/profile/getLanguage',
+                //'http://localhost:60290/profile/profile/getLanguage',
+                'https://module1talent-cnfucbdcave3ccgq.australiaeast-01.azurewebsites.net/profile/profile/getLanguage',
                 setLanguages
             );
         }, 500);
     };
-    const handleAddNewLanguage = (name, level) => {
-        var temp = [...languages, {
-            name:name,
-            level: level,
-            editState: false,
-        }];
-        // save language to database here
-        var newList = [...languageData, {
+    const handleAddNewLanguage = (name, level) => {        
+        var newLang = {
             name: name,
             level: level,
-        }];        
-        var profileData = {
-            languages : [...newList]
-        }
-        updateProfileData(profileData);
-        handleDelayCall();
+        };
+        //console.log(`${newLang.name}, ${newLang.level}`);
+        postApiCall(
+            //'http://localhost:60290/profile/profile/addLanguage',
+            'https://module1talent-cnfucbdcave3ccgq.australiaeast-01.azurewebsites.net/profile/profile/addLanguage',
+            newLang,
+            setLanguages
+        );
     }
+    
     const handleAddNewUI = (e) => {
         e.preventDefault();
         setAddNew(true);
@@ -104,76 +76,30 @@ export default function Language({ languageData, updateProfileData, updateWithou
     }
 
     const handleDeletelanguage = (index, languageId) => {
-        //let t = languages[index];
-        //var index = languages.findIndex(x => x.id === languageId);        
-        console.log(index);
-        const newArray = [...languages.slice(0, index), ...languages.slice(index + 1)];
-        console.table(newArray);
-        setLanguages(newArray);
-
-        // make API call here
-        console.log('languageid delete -> ' + languageId);
-        var languagetodelete = languages.filter(x => x.id === languageId)[0];
+        
+        var languageToDelete = languages[index];
         postApiCall(
-            'http://localhost:60290/profile/profile/DeleteLanguage',
-            languagetodelete,
+            //'http://localhost:60290/profile/profile/DeleteLanguage',
+            'https://module1talent-cnfucbdcave3ccgq.australiaeast-01.azurewebsites.net/profile/profile/DeleteLanguage',
+            languageToDelete,
             setLanguages
         );
     }
-    
-    const handleEditLanguage = (indexEdit) => {
-        // This is no longer possible when the props are passed from the parent component.
-        const tempLang = languages.map((todo, index) => {                        
-            if (index === indexEdit) {
-                const qw = todo;
-                qw.editState = true;
-                return qw;
-            }
-            return todo;
-        });
-        var profileData = {
-            languages: tempLang
-        }
-        updateWithoutSave(profileData);
-        //setLanguages(tempLangs);
-    }
-    const handleUpdateOk = (updateIndex, editLanguage, editLevel) => {
-        console.log(`${updateIndex}, ${editLanguage}, ${editLevel}`);
+        
+    const handleUpdateOk = (updateIndex, editLanguage, editLevel) => {        
         var languageToUpdate = languages[updateIndex];
         languageToUpdate.name = editLanguage;
         languageToUpdate.level = editLevel;
         
-        console.table(languageToUpdate);
+        //console.table(languageToUpdate);
         postApiCall(
-            'http://localhost:60290/profile/profile/updateLanguage',
+            //'http://localhost:60290/profile/profile/updateLanguage',
+            'https://module1talent-cnfucbdcave3ccgq.australiaeast-01.azurewebsites.net/profile/profile/updateLanguage',
             languageToUpdate,
             setLanguages
-        );
-
-        /*
-        var updateLanguage = languages.map((langItem, index) => {
-            if (index === updateIndex) {
-                const newLang = langItem;
-                newLang.name = editLanguage;
-                newLang.level = editLevel;
-                return newLang;
-            }
-            return langItem;
-        });
-        setLanguages(updateLanguage);
-        */
+        );        
     }
-    const handleUpdateCancel = (indexEdit) => {        
-        const newLangs = languages.map((lang, index) => {
-            if (index === indexEdit) {
-                const qw = lang;
-                qw.editState = false;
-                return qw;
-            }
-            return lang;
-        });
-        setLanguages(newLangs);        
-    }
+    
     return (        
         <div className='ui grid sixteen wide column'>
             
@@ -206,8 +132,7 @@ export default function Language({ languageData, updateProfileData, updateWithou
                                     index={index}
                                     languageId={language.id}
                                     languageName={language.name}
-                                    languageLevel={language.level}
-                                    handleEditLanguage={handleEditLanguage}
+                                    languageLevel={language.level}                                    
                                     handleDeletelanguage={handleDeletelanguage}
                                     handleUpdateOk={handleUpdateOk }
                                 />
@@ -220,12 +145,11 @@ export default function Language({ languageData, updateProfileData, updateWithou
     )
 }
 
-function DisplayLanguageTable({ index, languageId, languageName, languageLevel, handleEditLanguage, handleDeletelanguage, handleUpdateOk }) {
+function DisplayLanguageTable({ index, languageId, languageName, languageLevel, handleDeletelanguage, handleUpdateOk }) {
 
     const [editState, setEditState] = useState(false);
 
-    const handleEditForm = () => {
-        //handleEditLanguage(index);
+    const handleEditForm = () => {        
         setEditState(true);
     }
     const handleClose = () => {
@@ -242,9 +166,7 @@ function DisplayLanguageTable({ index, languageId, languageName, languageLevel, 
                 key={index}
                 index={index}
                 languageName={languageName}
-                languageLevel={languageLevel}
-                //handleUpdateOk={handleUpdateOk}
-                //handleUpdateCancel={handleUpdateCancel}
+                languageLevel={languageLevel}                
                 handleUpdateOk={handleUpdateLanguage}
                 handleUpdateCancel={() => { setEditState(false) } }
             />
@@ -282,13 +204,11 @@ function EditLanguageForm({ index, languageName, languageLevel, handleUpdateOk, 
     }
     const handleCancel = (e) => {
         e.preventDefault();
-        handleUpdateCancel();
-        //handleUpdateCancel(index);
+        handleUpdateCancel();        
     }
     return (
         <tr key={index}>
-            <td>
-                {/*{languageName}*/}
+            <td>                
                 <input
                     type='text'
                     name='Language'
@@ -298,8 +218,7 @@ function EditLanguageForm({ index, languageName, languageLevel, handleUpdateOk, 
                     onChange={(e) => setEditLanguage(e.target.value)}
                 />
             </td>
-            <td>
-                {/*{languageLevel}*/}
+            <td>                
                 <select
                     type='text'
                     name='Language'

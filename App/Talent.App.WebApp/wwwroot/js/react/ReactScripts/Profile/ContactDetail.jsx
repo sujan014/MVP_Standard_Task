@@ -8,14 +8,14 @@ export function IndividualDetailSection({ saveProfileData, details }) {
     const [edit, setEdit] = useState(false);
     useEffect(() => {
         setUserDetails(details);
-        console.table(details);        
+        //console.table(details);        
     }, [details]);
     const handleEdit = (e) => {
         e.preventDefault();
         setEdit(true);
     }
     const handleSaveDetails = (firstNameEdit, lastNameEdit, emailEdit, phoneEdit) => {        
-        console.log(`${firstNameEdit}, ${lastNameEdit}, ${emailEdit}, ${phoneEdit}`);
+        //console.log(`${firstNameEdit}, ${lastNameEdit}, ${emailEdit}, ${phoneEdit}`);
         const profileData = {
             firstName: firstNameEdit,
             lastName: lastNameEdit,
@@ -144,152 +144,152 @@ function EditDetail({ userDetails, saveDetails, cancelEdit }) {
     )    
 
 }
-//export class IndividualDetailSection extends Component {
-//    constructor(props) {
-//        super(props)
 
-//        const details = props.details ?
-//            Object.assign({}, props.details)
-//            : {
-//                firstName: "",
-//                lastName: "",
-//                email: "",
-//                phone: ""
-//            }
+export class EmployerDetailSection extends Component {
+    constructor(props) {
+        super(props)
 
-//        this.state = {
-//            showEditSection: false,
-//            newContact: details
-//        }
+        const details = props.details ?
+            Object.assign({}, props.details)
+            : {
+                firstName: "",
+                lastName: "",
+                email: "",
+                phone: ""
+            }
 
-//        this.openEdit = this.openEdit.bind(this)
-//        this.closeEdit = this.closeEdit.bind(this)
-//        this.handleChange = this.handleChange.bind(this)
-//        this.saveContact = this.saveContact.bind(this)
-//        this.renderEdit = this.renderEdit.bind(this)
-//        this.renderDisplay = this.renderDisplay.bind(this)
-//    }
+        this.state = {
+            showEditSection: false,
+            newContact: details
+        }
 
-//    openEdit() {
-//        const details = Object.assign({}, this.props.details)
-//        this.setState({
-//            showEditSection: true,
-//            newContact: details
-//        })
-//    }
+        this.openEdit = this.openEdit.bind(this)
+        this.closeEdit = this.closeEdit.bind(this)
+        this.handleChange = this.handleChange.bind(this)
+        this.saveContact = this.saveContact.bind(this)
+        this.renderEdit = this.renderEdit.bind(this)
+        this.renderDisplay = this.renderDisplay.bind(this)
+    }
 
-//    closeEdit() {
-//        this.setState({
-//            showEditSection: false
-//        })
-//    }
+    openEdit() {
+        const details = Object.assign({}, this.props.details)
+        this.setState({
+            showEditSection: true,
+            newContact: details
+        })
+    }
 
-//    handleChange(event) {
-//        const data = Object.assign({}, this.state.newContact)
-//        data[event.target.name] = event.target.value
-//        this.setState({
-//            newContact: data
-//        })
-//    }
+    closeEdit() {
+        this.setState({
+            showEditSection: false
+        })
+    }
 
-//    saveContact() {
-//        console.log(this.props.componentId)
-//        console.log(this.state.newContact)
-//        const data = Object.assign({}, this.state.newContact)
-//        this.props.controlFunc(this.props.componentId, data)
-//        this.closeEdit()
-//    }
+    handleChange(event) {
+        const data = Object.assign({}, this.state.newContact)
+        data[event.target.name] = event.target.value
+        this.setState({
+            newContact: data
+        })
+    }
 
-//    render() {
-//        return (
-//            this.state.showEditSection ? this.renderEdit() : this.renderDisplay()
-//        )
-//    }
+    saveContact() {
+        console.log(this.props.componentId)
+        console.log(this.state.newContact)
+        const data = Object.assign({}, this.state.newContact)
+        this.props.controlFunc(this.props.componentId, data)
+        this.closeEdit()
+    }
 
-//    renderEdit() {
-//        return (
-//            <div className='ui sixteen wide column'>
-//                <ChildSingleInput
-//                    inputType="text"
-//                    label="First Name"
-//                    name="firstName"
-//                    value={this.state.newContact.firstName}
-//                    controlFunc={this.handleChange}
-//                    maxLength={80}
-//                    placeholder="Enter your first name"
-//                    errorMessage="Please enter a valid first name"
-//                />
-//                <ChildSingleInput
-//                    inputType="text"
-//                    label="Last Name"
-//                    name="lastName"
-//                    value={this.state.newContact.lastName}
-//                    controlFunc={this.handleChange}
-//                    maxLength={80}
-//                    placeholder="Enter your last name"
-//                    errorMessage="Please enter a valid last name"
-//                />
-//                <ChildSingleInput
-//                    inputType="text"
-//                    label="Email address"
-//                    name="email"
-//                    value={this.state.newContact.email}
-//                    controlFunc={this.handleChange}
-//                    maxLength={80}
-//                    placeholder="Enter an email"
-//                    errorMessage="Please enter a valid email"
-//                />
+    render() {
+        return (
+            this.state.showEditSection ? this.renderEdit() : this.renderDisplay()
+        )
+    }
 
-//                <ChildSingleInput
-//                    inputType="text"
-//                    label="Phone number"
-//                    name="phone"
-//                    value={this.state.newContact.phone}
-//                    controlFunc={this.handleChange}
-//                    maxLength={12}
-//                    placeholder="Enter a phone number"
-//                    errorMessage="Please enter a valid phone number"
-//                />
+    renderEdit() {
+        return (
+            <div className='ui sixteen wide column'>
+                <ChildSingleInput
+                    inputType="text"
+                    label="First Name"
+                    name="firstName"
+                    value={this.state.newContact.firstName}
+                    controlFunc={this.handleChange}
+                    maxLength={80}
+                    placeholder="Enter your first name"
+                    errorMessage="Please enter a valid first name"
+                />
+                <ChildSingleInput
+                    inputType="text"
+                    label="Last Name"
+                    name="lastName"
+                    value={this.state.newContact.lastName}
+                    controlFunc={this.handleChange}
+                    maxLength={80}
+                    placeholder="Enter your last name"
+                    errorMessage="Please enter a valid last name"
+                />
+                <ChildSingleInput
+                    inputType="text"
+                    label="Email address"
+                    name="email"
+                    value={this.state.newContact.email}
+                    controlFunc={this.handleChange}
+                    maxLength={80}
+                    placeholder="Enter an email"
+                    errorMessage="Please enter a valid email"
+                />
 
-//                <button
-//                    type="button"
-//                    className="ui teal button"
-//                    onClick={this.saveContact}
-//                >
-//                    Save
-//                </button>
-//                <button
-//                    type="button"
-//                    className="ui button"
-//                    onClick={this.closeEdit}
-//                >
-//                    Cancel
-//                </button>
-//            </div>
-//        )
-//    }
+                <ChildSingleInput
+                    inputType="text"
+                    label="Phone number"
+                    name="phone"
+                    value={this.state.newContact.phone}
+                    controlFunc={this.handleChange}
+                    maxLength={12}
+                    placeholder="Enter a phone number"
+                    errorMessage="Please enter a valid phone number"
+                />
 
-//    renderDisplay() {
+                <button
+                    type="button"
+                    className="ui teal button"
+                    onClick={this.saveContact}
+                >
+                    Save
+                </button>
+                <button
+                    type="button"
+                    className="ui button"
+                    onClick={this.closeEdit}
+                >
+                    Cancel
+                </button>
+            </div>
+        )
+    }
 
-//        let fullName = this.props.details ? `${this.props.details.firstName} ${this.props.details.lastName}` : ""
-//        let email = this.props.details ? this.props.details.email : ""
-//        let phone = this.props.details ? this.props.details.phone : ""
+    renderDisplay() {
 
-//        return (
-//            <div className='row'>
-//                <div className="ui sixteen wide column">
-//                    <React.Fragment>
-//                        <p>Name: {fullName}</p>
-//                        <p>Email: {email}</p>
-//                        <p>Phone: {phone}</p>
-//                    </React.Fragment>
-//                    <button type="button" className="ui right floated teal button" onClick={this.openEdit}>Edit</button>
-//                </div>
-//            </div>
-//        )
-//    }
-//}
+        let fullName = this.props.details ? `${this.props.details.firstName} ${this.props.details.lastName}` : ""
+        let email = this.props.details ? this.props.details.email : ""
+        let phone = this.props.details ? this.props.details.phone : ""
 
+        return (
+            <div className='row'>
+                <div className="ui sixteen wide column">
+                    <React.Fragment>
+                        <p>Name: {fullName}</p>
+                        <p>Email: {email}</p>
+                        <p>Phone: {phone}</p>
+                    </React.Fragment>
+                    <button type="button" className="ui right floated teal button" onClick={this.openEdit}>Edit</button>
+                </div>
+            </div>
+        )
+    }
+}
 
 export class CompanyDetailSection extends Component {
     constructor(props) {

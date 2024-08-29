@@ -4,18 +4,6 @@ import { default as Countries } from '../../../../util/jsonFiles/countries.json'
 import { ChildSingleInput } from '../Form/SingleInput.jsx';
 import { Button } from 'semantic-ui-react';
 
-//export class Address extends React.Component {
-//    constructor(props) {
-//        super(props)
-//    }
-
-
-//    render() {
-
-//    }
-
-//}
-
 const countriesOptions = Object.keys(Countries).map((x) => <option key={x} value={x}>{x}</option>);
 
 export function Address({ address, updateProfileData, saveProfileData }) {    
@@ -36,10 +24,7 @@ export function Address({ address, updateProfileData, saveProfileData }) {
         setNewCountry(address.country);
         setNewCity(address.city);
         setNewPostCode(address.postCode);
-    }, [address.number, address.street, address.suburb, address.country, address.city, address.postCode]);
-
-    //console.log('addressData: ' + JSON.stringify(address));    
-    //console.log('newNumber: ' + newNumber);    
+    }, [address.number, address.street, address.suburb, address.country, address.city, address.postCode]);    
 
     const handleCountrySelect = (e) => {
         var data = e.target.value;
@@ -76,8 +61,7 @@ export function Address({ address, updateProfileData, saveProfileData }) {
                 country: newCountry,
                 postCode: parseInt(newPostCode),
             }
-        }
-        console.log(profileData);
+        }        
         saveProfileData(profileData);
         setEditAddress(false);
     }
@@ -214,17 +198,15 @@ export function Nationality({ nationalityData, saveProfileData }) {
     }, [nationalityData]);
 
     const handleNationality = (e) => {
-        e.preventDefault();
-        console.log('new country: ' + e.target.value);
+        e.preventDefault();        
         setNewNationality(e.target.value);        
     }
     const handleSaveNationality = (e) => {
         e.preventDefault();
-        console.log(newNationality);
+        
         var profileData = {
             nationality: newNationality
-        }
-        console.log('profileData: ' + JSON.stringify(profileData));
+        }        
         // save data also here
         saveProfileData(profileData);
     }
@@ -259,15 +241,3 @@ export function Nationality({ nationalityData, saveProfileData }) {
         </div>
     )
 }
-//export class Nationality extends React.Component {
-//    constructor(props) {
-//        super(props)
-       
-//    }
-
-    
-//    render() {
-
-        
-//    }
-//}

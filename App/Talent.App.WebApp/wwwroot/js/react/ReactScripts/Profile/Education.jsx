@@ -5,19 +5,6 @@ import { default as Countries } from '../../../../../wwwroot/util/jsonFiles/coun
 import { ChildSingleInput } from '../Form/SingleInput.jsx';
 import { getApiCall, postApiCall } from './ApiUtil.jsx';
 
-//export default class Education extends React.Component {
-//    constructor(props) {
-//        super(props)
-//    };
-
-//    render() {
-//        return (
-//            <div>Hello my boy
-//            </div>
-//        )
-//    }
-//}
-
 export default function Education({ educationData, updateProfileData }) {
     
     const [eduData, setEduData] = useState([]);
@@ -25,7 +12,8 @@ export default function Education({ educationData, updateProfileData }) {
 
     useEffect(() => {
         getApiCall(
-            'http://localhost:60290/profile/profile/getEducation',
+            //'http://localhost:60290/profile/profile/getEducation',
+            'https://module1talent-cnfucbdcave3ccgq.australiaeast-01.azurewebsites.net/profile/profile/getEducation',
             setEduData
         );
     }, []);
@@ -33,7 +21,8 @@ export default function Education({ educationData, updateProfileData }) {
     const handleDelayCall = () => {
         setTimeout(() => {
             getApiCall(
-                'http://localhost:60290/profile/profile/getEducation',
+                //'http://localhost:60290/profile/profile/getEducation',
+                'https://module1talent-cnfucbdcave3ccgq.australiaeast-01.azurewebsites.net/profile/profile/getEducation',
                 setEduData
             );
         }, 500);
@@ -53,7 +42,8 @@ export default function Education({ educationData, updateProfileData }) {
             yearOfGraduation: parseInt(newYog)
         }
         postApiCall(
-            'http://localhost:60290/profile/profile/addEducation',
+            //'http://localhost:60290/profile/profile/addEducation',
+            'https://module1talent-cnfucbdcave3ccgq.australiaeast-01.azurewebsites.net/profile/profile/addEducation',
             addNewEdu,
             setEduData
         )
@@ -62,7 +52,8 @@ export default function Education({ educationData, updateProfileData }) {
     const handleDeleteEdu = (index) => {
         let deleteEdu = eduData[index];
         postApiCall(
-            'http://localhost:60290/profile/profile/deleteEducation',
+            //'http://localhost:60290/profile/profile/deleteEducation',
+            'https://module1talent-cnfucbdcave3ccgq.australiaeast-01.azurewebsites.net/profile/profile/deleteEducation',
             deleteEdu,
             setEduData
         )                
@@ -86,9 +77,10 @@ export default function Education({ educationData, updateProfileData }) {
         eduToUpdate.title = newTitle;
         eduToUpdate.degree = newDegree;
         eduToUpdate.yearOfGraduation = newGradYear;
-        console.log(`${eduToUpdate.country}, ${eduToUpdate.instituteName}, ${eduToUpdate.title}, ${eduToUpdate.degree}, ${eduToUpdate.yearOfGraduation}.`);
+        //console.log(`${eduToUpdate.country}, ${eduToUpdate.instituteName}, ${eduToUpdate.title}, ${eduToUpdate.degree}, ${eduToUpdate.yearOfGraduation}.`);
         postApiCall(
-            'http://localhost:60290/profile/profile/updateEducation',
+            //'http://localhost:60290/profile/profile/updateEducation',
+            'https://module1talent-cnfucbdcave3ccgq.australiaeast-01.azurewebsites.net/profile/profile/updateEducation',
             eduToUpdate,
             setEduData
         );        
@@ -112,8 +104,7 @@ export default function Education({ educationData, updateProfileData }) {
                         instituteName={edu.instituteName}
                         title={edu.title}
                         degree={edu.degree}
-                        yearOfGraduation={edu.yearOfGraduation}                        
-                        handleEditEdu={handleEditEdu}
+                        yearOfGraduation={edu.yearOfGraduation}                                                
                         handleDeleteEdu={handleDeleteEdu}
                         handleUpdateEdu={handleUpdateEdu}
                     />
@@ -216,7 +207,7 @@ function UpdateEduForm({ index, country, instituteName, title, degree, YoG, hand
                         className='ui teal button'
                         onClick={handleUpdate}
                     >
-                        Add
+                        Update
                     </button>
                     <button
                         className='ui primary basic button'
@@ -229,7 +220,7 @@ function UpdateEduForm({ index, country, instituteName, title, degree, YoG, hand
         </div>
     )
 }
-function EducationTable({ index, country, instituteName, title, degree, yearOfGraduation, handleEditEdu, handleDeleteEdu, handleUpdateEdu }) {
+function EducationTable({ index, country, instituteName, title, degree, yearOfGraduation, handleDeleteEdu, handleUpdateEdu }) {
 
     const [editState, setEditState] = useState(false);
     

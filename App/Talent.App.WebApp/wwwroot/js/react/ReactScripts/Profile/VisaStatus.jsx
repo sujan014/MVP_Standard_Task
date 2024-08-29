@@ -3,17 +3,6 @@ import { SingleInput } from '../Form/SingleInput.jsx';
 import moment from 'moment';
 import DatePicker from 'react-datepicker';
 
-//export default class VisaStatus extends React.Component {
-//    constructor(props) {
-//        super(props)
-
-//    }
-
-//    render() {
-
-//    }
-//}
-
 const visaValues = [
     {
         key: 1,
@@ -52,30 +41,35 @@ export default function VisaStatus({ visaStatus, visaExpiryDate, updateProfileDa
     }
     useEffect(
         () => {
+            setVisa(visa);
             setVisaExpiry(moment(visaExpiryDate));
             checkVisa(visaStatus);
         }, [visaStatus, visaExpiryDate]
     );
     const handleVisaSelect = (value) => {
-        const profileData = {
-            visaStatus: value
-        }
-        updateProfileData(profileData);
-        //setVisa(value);
-        //checkVisa(value);
+        //const profileData = {
+        //    visaStatus: value
+        //}
+        //updateProfileData(profileData);
+        setVisa(value);
+        checkVisa(value);
     }
     const handleVisaExpiryDate = (date) => {
-        const profileData = {
-            visaExpiryDate: date
-        }
-        updateProfileData(profileData);
-        //setVisaExpiry(date);
+        //const profileData = {
+        //    visaExpiryDate: date
+        //}
+        //updateProfileData(profileData);
+        setVisaExpiry(date);
     }
     const handleVisaStatusSave = (e) => {
         e.preventDefault();
-        const profileData = {
-            visaStatus: visaStatus,
-            visaExpiryDate: moment(visaExpiryDate)
+        var profileData = {
+            //visaStatus: visaStatus,
+            //visaExpiryDate: moment(visaExpiryDate)
+            visaStatus: visa,            
+        }
+        if (visa === 'Work Visa' || visa === 'Student Visa') {
+            profileData.visaExpiryDate = moment(visaExpiry);
         }
         saveProfileData(profileData);
     }
@@ -92,7 +86,7 @@ export default function VisaStatus({ visaStatus, visaExpiryDate, updateProfileDa
                     <div className="field">
                         <label>Visa type</label>
                         <select className="ui right labeled dropdown"
-                            value={visaStatus}
+                            value={visa}//value={visaStatus}
                             onChange={(e) => handleVisaSelect(e.target.value)}
                             name="Visa Status"
                         >

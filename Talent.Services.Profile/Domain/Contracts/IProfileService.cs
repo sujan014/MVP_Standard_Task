@@ -11,7 +11,7 @@ namespace Talent.Services.Profile.Domain.Contracts
 {
     public interface IProfileService
     {
-        bool AddNewLanguage(AddLanguageViewModel language);
+        //bool AddNewLanguage(AddLanguageViewModel language);
         
         Task<TalentProfileViewModel> GetTalentProfile(String Id);
         Task<IEnumerable<string>> GetTalentSuggestionIds(string employerOrJobId, bool forJob, int position, int increment);
@@ -42,5 +42,22 @@ namespace Talent.Services.Profile.Domain.Contracts
 
         Task<IEnumerable<ClientViewModel>> GetClientListAsync(string recruiterId);
         Task<Employer> GetEmployer(string employerId);
+
+        // Added by Sujan
+        Task<List<AddLanguageViewModel>> AddTalentLanguage(String Id, AddLanguageViewModel language);
+        Task<List<AddLanguageViewModel>> UpdateTalentLanguage(String Id, AddLanguageViewModel language);
+        Task<List<AddLanguageViewModel>> DeleteTalentLanguage(String Id, AddLanguageViewModel language);
+
+        Task<List<AddSkillViewModel>> AddTalentSkill(String Id, AddSkillViewModel skill);
+        Task<List<AddSkillViewModel>> UpdateTalentSkill(String Id, AddSkillViewModel skill);
+        Task<List<AddSkillViewModel>> DeleteTalentSkill(String Id, AddSkillViewModel skill);
+
+        Task<List<ExperienceViewModel>> AddTalentExperience(String Id, ExperienceViewModel experience);
+        Task<List<ExperienceViewModel>> DeleteTalentExperience(String Id, ExperienceViewModel experience);
+        Task<List<ExperienceViewModel>> UpdateTalentExperience(String Id, ExperienceViewModel experience);
+
+        Task<List<AddEducationViewModel>> AddTalentEducation(String Id, AddEducationViewModel educat);
+        Task<List<AddEducationViewModel>> DeleteTalentEducation(String Id, AddEducationViewModel educat);
+        Task<List<AddEducationViewModel>> UpdateTalentEducation(String Id, AddEducationViewModel educat);
     }
 }

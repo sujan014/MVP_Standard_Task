@@ -34,6 +34,12 @@ namespace Talent.Services.Identity.Controllers
             _userAppContext = userAppContext;
         }
 
+        [HttpGet("test")]
+        public IActionResult GetTest() 
+        {
+            return Json(new { Success=true, message="Standard Authentication Service" });
+        }
+
         [HttpPost("signup")]
         public async Task<IActionResult> Signup([FromBody]CreateUser command)
         {

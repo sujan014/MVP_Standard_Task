@@ -1,4 +1,4 @@
-﻿import React from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import SocialMediaLinkedAccount from './SocialMediaLinkedAccount.jsx';
 import { IndividualDetailSection } from './ContactDetail.jsx';
@@ -18,6 +18,8 @@ import { BodyWrapper, loaderData } from '../Layout/BodyWrapper.jsx';
 import { LoggedInNavigation } from '../Layout/LoggedInNavigation.jsx';
 import TalentStatus from './TalentStatus.jsx';
 import moment from 'moment';
+import axios from 'axios';
+import { getApiCall, postApiCall } from './ApiUtil.jsx';
 
 export default class AccountProfile extends React.Component {
     constructor(props) {
@@ -37,37 +39,23 @@ export default class AccountProfile extends React.Component {
                     postCode: 0, // Check inputs related to this field.
                 },
                 nationality: '',
-                education: [
-                    /*
-                    { country: 'Nepal', instituteName: 'IOE', title: 'Elex', degree: 'B.E', YoG: 2009 },
-                    { country: 'Korea', instituteName: 'CU', title: 'IT', degree: 'ME', YoG: 2013 }
-                    */
-                ],
-                languages: [
-                    //{ name: 'English', level: 'Basic',},
-                    //{ name: 'Aussie', level: 'Fluent', }
-                ],
-                skills: [
-                    //{ name: 'C#', level: 'Beginner', },
-                    //{ name: 'React JS', level: 'Intermediate', },
-                    //{ name: 'JavaScript', level: 'Expert', },
-                ],
-                experience: [
-                    //{ company: 'Company1', position: 'Software developer', startDate: '', endDate: '', duty: 'coding', },
-                    //{ company: 'Company2', position: 'Hardware developer', startDate: new Date().toLocaleDateString(), endDate: new Date().toLocaleDateString(), duty: 'coding', }
-                ],
+                education: [],
+                languages: [],
+                skills: [],
+                experience: [],
                 certifications: [],
                 visaStatus: '',//'Student Visa',
                 visaExpiryDate: moment(),//'',new Date(),//
-                profilePhoto: '',
+                //profilePhoto: '',
                 linkedAccounts: {
                     linkedIn: "",
                     github: "",                    
                 },
-                jobSeekingStatus: {
-                    status: "",
-                    availableDate: null
-                },
+                jobSeekingStatus: "",
+                //jobSeekingStatus: {
+                //    status: "",
+                //    availableDate: moment()
+                //},
                 firstName: '',
                 middleName: '',
                 lastName: '',
@@ -92,6 +80,7 @@ export default class AccountProfile extends React.Component {
         this.saveProfile = this.saveProfile.bind(this)
         this.loadData = this.loadData.bind(this)
         this.init = this.init.bind(this);
+        this.removeNulls = this.removeNulls.bind(this);
     };
 
     init() {
@@ -105,41 +94,84 @@ export default class AccountProfile extends React.Component {
         this.loadData();
     }
 
-    loadData() {
+    loadData() {        
         var cookies = Cookies.get('talentAuthToken');
-        $.ajax({
-            url: 'http://localhost:60290/profile/profile/getTalentProfile',
-            headers: {
-                'Authorization': 'Bearer ' + cookies,
-                'Content-Type': 'application/json'
-            },
-            type: "GET",
-            success: function (res) {
-                this.updateWithoutSave(res.data)
-            }.bind(this)
-        })
+        //$.ajax({
+        //    url: 'http://localhost:60290/profile/profile/getTalentProfile',
+        //    headers: {
+        //        'Authorization': 'Bearer ' + cookies,
+        //        'Content-Type': 'application/json'
+        //    },
+        //    type: "GET",
+        //    success: function (res) {
+        //        console.log('RES');
+        //        console.log(res);
+        //        console.log('Response data');
+        //        console.log(res.data);
+        //        this.updateWithoutSave(res.data)
+        //    }.bind(this)
+        //})
+        getApiCall(
+            //'http://localhost:60290/profile/profile/getTalentProfile',
+            'https://module1talent-cnfucbdcave3ccgq.australiaeast-01.azurewebsites.net/profile/profile/getTalentProfile',
+            this.updateWithoutSave
+        );
         this.init()
+        
+    }    
+    removeNulls(object) {        
+        if (object.id == null) { object.id = ''};
+        if (object.summary == null) { object.summary = '' };
+        if (object.description == null) object.description = '';
+        //if (object.address.number == null) object.address.number = '';
+        //if (object.address.street == null) object.address.street = '';
+        //if (object.address.suburb == null) object.address.suburb = '';
+        //if (object.address.city == null) object.address.city = '';
+        //if (object.address.country == null) object.address.country = '';
+        //if (object.address.postCode == null) object.address.postCode = 0;
+        if (object.nationality == null) object.nationality = '';
+        if (object.visaStatus == null) object.visaStatus = '';
+        if (object.visaExpiryDate == null) object.visaExpiryDate = moment();
+        if (object.profilePhoto == null) object.profilePhoto = '';
+        if (object.profilePhotoUrl == null) object.profilePhotoUrl = '';
+        //if (object.linkedAccounts.linkedIn == null) object.linkedAccounts.linkedIn = '';
+        //if (object.linkedAccounts.github == null) object.linkedAccounts.github = '';
+        if (object.jobSeekingStatus == null) object.jobSeekingStatus = '';        
+        if (object.firstName == null) object.firstName = '';
+        if (object.middleName == null) object.middleName = '';
+        if (object.lastName == null) object.lastName = '';
+        if (object.gender == null) object.gender = '';
+        if (object.email == null) object.email = '';
+        if (object.phone == null) object.phone = '';
+        if (object.mobilePhone == null) object.mobilePhone = '';
+        if (object.isPhoneVerified == null) object.isPhoneVerified = false;
+        if (object.videoName == null) object.videoName = '';
+        if (object.videoUrl == null) object.videoUrl = '';
+        if (object.cvName == null) object.cvName = '';
+        if (object.cvUrl == null) object.cvUrl = '';
+
+        return object;
     }
     //updates component's state without saving data
     updateWithoutSave(newValues) {
-        let newProfile = Object.assign({}, this.state.profileData, newValues)
+        let filterData = this.removeNulls(newValues);
+        //let newProfile = Object.assign({}, this.state.profileData, newValues)
+        let newProfile = Object.assign({}, this.state.profileData, filterData)
         this.setState(
             {
                 profileData: newProfile
             },
             () => {
-                //console.log(JSON.stringify(this.state.profileData));
-                console.log('Job status: ' + this.state.profileData.jobSeekingStatus.status);
+                //console.log(`profileData: `);console.log(this.state.profileData);
             }
         )
     }
 
     //updates component's state and saves data
-    updateAndSaveData(newValues) {
-        console.log('newValues: ' + JSON.stringify(newValues));
-        let newProfile = Object.assign({}, this.state.profileData, newValues)
-        //console.log('newProfile' + JSON.stringify(newProfile));
-        console.log(`newProfile: ${newProfile.firstName}, ${newProfile.lastName}, ${newProfile.email}, ${newProfile.phone}.`)
+    updateAndSaveData(newValues) {        
+        //let filterData = this.removeNulls(newValues);
+        //let newProfile = Object.assign({}, this.state.profileData, filterData);
+        let newProfile = Object.assign({}, this.state.profileData, newValues);        
         this.setState({
             profileData: newProfile
         }, this.saveProfile)
@@ -149,34 +181,39 @@ export default class AccountProfile extends React.Component {
         this.updateAndSaveData(newValues)
     }
 
-    saveProfile() {
-        console.log(`new profileData: ${this.state.profileData.firstName}, ${this.state.profileData.lastName}, ${this.state.profileData.email}, ${this.state.profileData.phone}.`);
-        console.info(this.state.profileData);
-        var cookies = Cookies.get('talentAuthToken');
-        $.ajax({
-            url: 'http://localhost:60290/profile/profile/updateTalentProfile',
-            headers: {
-                'Authorization': 'Bearer ' + cookies,
-                'Content-Type': 'application/json'
-            },
-            type: "POST",
-            data: JSON.stringify(this.state.profileData),
-            success: function (res) {
-                console.log(res)
-                if (res.success == true) {
-                    TalentUtil.notification.show("Profile updated sucessfully", "success", null, null)
-                } else {
-                    TalentUtil.notification.show("Profile did not update successfully", "error", null, null)
+    saveProfile() {        
+        postApiCall(
+            //'http://localhost:60290/profile/profile/updateTalentProfile',
+            'https://module1talent-cnfucbdcave3ccgq.australiaeast-01.azurewebsites.net/profile/profile/updateTalentProfile',
+            JSON.stringify(this.state.profileData),
+            () => { }
+        );
 
-                }
+        //var cookies = Cookies.get('talentAuthToken');
+        //$.ajax({
+        //    url: 'http://localhost:60290/profile/profile/updateTalentProfile',
+        //    headers: {
+        //        'Authorization': 'Bearer ' + cookies,
+        //        'Content-Type': 'application/json'
+        //    },
+        //    type: "POST",
+        //    data: JSON.stringify(this.state.profileData),
+        //    success: function (res) {
+        //        console.log(res)
+        //        if (res.success == true) {
+        //            TalentUtil.notification.show("Profile updated sucessfully", "success", null, null)
+        //        } else {
+        //            TalentUtil.notification.show("Profile did not update successfully", "error", null, null)
 
-            }.bind(this),
-            error: function (res, a, b) {
-                console.log(res)
-                console.log(a)
-                console.log(b)
-            }
-        })
+        //        }
+
+        //    }.bind(this),
+        //    error: function (res, a, b) {
+        //        console.log(res)
+        //        console.log(a)
+        //        console.log(b)
+        //    }
+        //})
     }
 
     render() {
@@ -273,10 +310,7 @@ export default class AccountProfile extends React.Component {
                                                 experienceData={this.state.profileData.experience}
                                                 updateProfileData={this.updateAndSaveData}
                                             />
-                                        </FormItemWrapper>
-
-                                        {/*Experience Error in saving Start, End data*/}
-
+                                        </FormItemWrapper>                                        
                                         <FormItemWrapper
                                             title='Education'
                                             tooltip='Add your educational background'
@@ -285,16 +319,7 @@ export default class AccountProfile extends React.Component {
                                                 educationData={this.state.profileData.education}
                                                 updateProfileData={this.updateAndSaveData}
                                             />
-                                        </FormItemWrapper>
-                                        {/*<FormItemWrapper*/}
-                                        {/*    title='Certification'*/}
-                                        {/*    tooltip='List your certificates, honors and awards'*/}
-                                        {/*>*/}
-                                        {/*    <Certificate*/}
-                                        {/*        certificateData={this.state.profileData.certifications}*/}
-                                        {/*        updateProfileData={this.updateAndSaveData}*/}
-                                        {/*    />*/}
-                                        {/*</FormItemWrapper>*/}
+                                        </FormItemWrapper>                                        
                                         <FormItemWrapper
                                             title='Visa Status'
                                             tooltip='What is your current Visa/Citizenship status?'
@@ -322,12 +347,21 @@ export default class AccountProfile extends React.Component {
                                             tooltip='Please upload your profile photo'
                                             hideSegment={true}
                                         >
-                                            <PhotoUpload
+                                            <PhotoUpload                                                
                                                 imageId={this.state.profileData.profilePhotoUrl}
                                                 updateProfileData={this.updateWithoutSave}
-                                                savePhotoUrl='http://localhost:60290/profile/profile/updateProfilePhoto'
+                                                savePhotoUrl='https://module1profile-b9cwa0hmcbbbejbk.australiaeast-01.azurewebsites.net/profile/profile/updateProfilePhoto'
                                             />
                                         </FormItemWrapper>
+                                        {/*<FormItemWrapper*/}
+                                        {/*    title='Certification'*/}
+                                        {/*    tooltip='List your certificates, honors and awards'*/}
+                                        {/*>*/}
+                                        {/*    <Certificate*/}
+                                        {/*        certificateData={this.state.profileData.certifications}*/}
+                                        {/*        updateProfileData={this.updateAndSaveData}*/}
+                                        {/*    />*/}
+                                        {/*</FormItemWrapper>*/}
                                         {/*<FormItemWrapper*/}
                                         {/*    title='Profile Video'*/}
                                         {/*    tooltip='Upload a brief self-introduction video'*/}

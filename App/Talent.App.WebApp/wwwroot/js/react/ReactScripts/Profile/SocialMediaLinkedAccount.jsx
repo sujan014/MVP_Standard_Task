@@ -1,39 +1,7 @@
 ﻿/* Social media JSX */
 import React, { useState } from 'react';
 import { ChildSingleInput } from '../Form/SingleInput.jsx';
-import { Button, Popup } from 'semantic-ui-react';
-
-//export default class SocialMediaLinkedAccount extends React.Component {
-//    constructor(props) {
-//        super(props);
-
-
-//    }
-
-//    componentDidMount() {
-//        //$('.ui.button.social-media').popup();
-//    }
-
-
-
-//    render() {
-//        return (
-//            <div className='ui three column grid'>
-//                <Button className='primary'>
-//                    Linked
-//                </Button>
-//                <Button className='secondary'>
-//                    Github
-//                </Button>
-                
-//                <Button className='secondary right floated'>
-//                    Edit
-//                </Button>
-//            </div>
-//        )
-//    }
-//}
-
+import { Button, Icon, Popup } from 'semantic-ui-react';
 export default function SocialMediaLinkedAccount({ linkedAccounts, updateProfileData, saveProfileData }) {
     const [accounts, setAccounts] = useState(linkedAccounts);
     const [edit, setEdit] = useState(false);
@@ -65,6 +33,7 @@ export default function SocialMediaLinkedAccount({ linkedAccounts, updateProfile
                             className='primary'
                             onClick={(e) => e.preventDefault()}
                         >
+                            <Icon name='linkedin' />
                             LinkedIn
                         </Button>
                     </div>
@@ -76,7 +45,8 @@ export default function SocialMediaLinkedAccount({ linkedAccounts, updateProfile
                             <Button
                                 className='secondary'
                                 onClick={(e) => e.preventDefault()}
-                            >
+                        >
+                                <Icon name='github' />
                                 Github
                             </Button>
                         </div>

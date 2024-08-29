@@ -6,6 +6,7 @@
   "dependencies": {
     "axios": "^1.7.3",
     "draft-js": "^0.10.5",
+    "file-loader": "^6.2.0",
     "moment": "^2.22.2",
     "react": "^16.3.2",
     "react-ckeditor-component": "^1.1.0",
@@ -13,6 +14,7 @@
     "react-dom": "^16.3.2",
     "react-player": "^1.5.1",
     "react-router-dom": "^4.2.2",
+    "url-loader": "^4.1.1",
     "webpack": "^4.5.0"
   },
   "scripts": {

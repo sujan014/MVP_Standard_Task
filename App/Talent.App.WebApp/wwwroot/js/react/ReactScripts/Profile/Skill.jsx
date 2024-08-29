@@ -3,18 +3,6 @@ import React, { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import { getApiCall, postApiCall } from './ApiUtil.jsx';
 
-//export default class Skill extends React.Component {
-//    constructor(props) {
-//        super(props);
-
-//    };
-
-
-//   render() {
-
-//    }
-//}
-
 const skillOptions = [
     {
         value: '',
@@ -36,24 +24,23 @@ const skillOptions = [
 
 export default function Skill({ skillData, updateProfileData, updateWithoutSave }) {    
 
-    const [skills, setSkills] = useState([]);
-    const [newSkill, setNewSkill] = useState('');
-    const [newLevel, setNewLevel] = useState('');
+    const [skills, setSkills] = useState([]);    
     const [addNew, setAddNew] = useState(false);
 
     useEffect(() => {
         getApiCall(
-            'http://localhost:60290/profile/profile/getSkill',
+            //'http://localhost:60290/profile/profile/getSkill',
+            'https://module1talent-cnfucbdcave3ccgq.australiaeast-01.azurewebsites.net/profile/profile/getSkill',
             setSkills
         );
     },
-        []
-        //[tskills]
+        []        
     );
     const handleDelayCall = () => {
         setTimeout(() => {
             getApiCall(
-                'http://localhost:60290/profile/profile/getSkill',
+                //'http://localhost:60290/profile/profile/getSkill',
+                'https://module1talent-cnfucbdcave3ccgq.australiaeast-01.azurewebsites.net/profile/profile/getSkill',
                 setSkills
             );
         }, 500);
@@ -62,17 +49,19 @@ export default function Skill({ skillData, updateProfileData, updateWithoutSave 
         e.preventDefault();
         setAddNew(true);
     }
-    const handleAddNewSkill = (newSkill, newLevel) => {        
-        var newList = [...skillData, {
+    const handleAddNewSkill = (newSkill, newLevel) => {
+        var addNewSkill = {
             name: newSkill,
             level: newLevel
-        }];
-        var profileData = {
-            skills: [...newList]
-        }
-        updateProfileData(profileData);
-        handleDelayCall();
+        };        
+        postApiCall(
+            //'http://localhost:60290/profile/profile/addSkill',
+            'https://module1talent-cnfucbdcave3ccgq.australiaeast-01.azurewebsites.net/profile/profile/addSkill',
+            addNewSkill,
+            setSkills
+        );
     }
+    
     const handleCancelNewUI = () => {
         setAddNew(false);
     }
@@ -81,58 +70,26 @@ export default function Skill({ skillData, updateProfileData, updateWithoutSave 
         const newArray = [...skills.slice(0, index), ...skills.slice(index + 1)];
         //setSkills(newArray);
 
-        // API call
-        console.log(`deleteSkill -> ${deleteSkill}`);
+        // API call        
         postApiCall(
-            'http://localhost:60290/profile/profile/deleteSkill',
+            //'http://localhost:60290/profile/profile/deleteSkill',
+            'https://module1talent-cnfucbdcave3ccgq.australiaeast-01.azurewebsites.net/profile/profile/deleteSkill',
             deleteSkill,
             setSkills
         )
     }
-    const handleEditSkill = (indexEdit) => {
-        const tempSkills = skills.map((item, index) => {
-            if (index === indexEdit) {
-                const qw = item;
-                qw.editState = true;
-                return qw;
-            }
-            return item;
-        });
-        setSkills(tempSkills);
-    }
+    
     const handleUpdateOk = (editIndex, editSkill, editLevel) => {
         var skillToUpdate = skills[editIndex];
         skillToUpdate.name = editSkill;
-        skillToUpdate.level = editLevel;
-        console.table(skillToUpdate);
+        skillToUpdate.level = editLevel;        
         postApiCall(
-            'http://localhost:60290/profile/profile/updateSkill',
+            //'http://localhost:60290/profile/profile/updateSkill',
+            'https://module1talent-cnfucbdcave3ccgq.australiaeast-01.azurewebsites.net/profile/profile/updateSkill',
             skillToUpdate,
             setSkills
-        );
-        /*var tempSkills = skills.map((oldSkill, index) => {
-            if (index === editIndex) {
-                var updateSkill = oldSkill;
-                updateSkill.name = editSkill;
-                updateSkill.level = editLevel;
-                updateSkill.editState = false;
-                return updateSkill;
-            }
-            return oldSkill;
-        });
-        setSkills(tempSkills);*/
-    }
-    const handleUpdateCancel = (indexEdit) => {
-        const newSkills = skills.map((item, index) => {
-            if (index === indexEdit) {
-                const qw = item;
-                qw.editState = false;
-                return qw;
-            }
-            return item;
-        });
-        setSkills(newSkills);
-    }
+        );        
+    }    
 
     return (
         <div className='ui grid sixteen wide column'>
@@ -158,33 +115,17 @@ export default function Skill({ skillData, updateProfileData, updateWithoutSave 
                         </tr>
                     </thead>
                     <tbody>
-                        {skills.map((skill, index) => {
-                            //if (skill.editState === false) {
-                                // Skills Default view
-                                return(
-                                    < DisplaySkillTable
-                                        key={ index }
-                                        index={index}
-                                        skillName={skill.name}
-                                        skillLevel={skill.level}
-                                        handleEditSkill={ handleEditSkill }
-                                        handleDeleteSkill={handleDeleteSkill}
-                                        handleUpdateOk={handleUpdateOk}
-                                    />
-                                )
-                            /*} else if (skill.editState === true) {
-                                // Languages Edit view
-                                return (
-                                    < EditSkillForm
-                                        key={index}
-                                        index={index}
-                                        skillName={skill.name}
-                                        skillLevel={skill.level}
-                                        handleUpdateOk={handleUpdateOk}
-                                        handleUpdateCancel={handleUpdateCancel}
-                                    />
-                                )
-                            }*/
+                        {skills.map((skill, index) => {                            
+                            return(
+                                < DisplaySkillTable
+                                    key={ index }
+                                    index={index}
+                                    skillName={skill.name}
+                                    skillLevel={skill.level}                                    
+                                    handleDeleteSkill={handleDeleteSkill}
+                                    handleUpdateOk={handleUpdateOk}
+                                />
+                            )                            
                         })}
                     </tbody>
                 </table>
@@ -193,7 +134,7 @@ export default function Skill({ skillData, updateProfileData, updateWithoutSave 
     )
 }
 
-function DisplaySkillTable({ index, skillName, skillLevel, handleEditSkill, handleDeleteSkill, handleUpdateOk }) {
+function DisplaySkillTable({ index, skillName, skillLevel, handleDeleteSkill, handleUpdateOk }) {
 
     const [editState, setEditState] = useState(false);
 
@@ -344,8 +285,7 @@ function AddSkillForm({ onAddLanguage, onClose }) {
                 </button>
                 <button
                     className='ui button'
-                    onClick={ handleCancel }
-                    //onClick={handleCancelNewUI}
+                    onClick={ handleCancel }                    
                 >
                     Cancel
                 </button>

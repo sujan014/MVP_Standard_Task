@@ -47,6 +47,13 @@ namespace Talent.Services.Listing.Controllers
             _talentService = talentService;
         }
 
+        
+        [HttpGet("test")]
+        public IActionResult GetTest()
+        {
+            return Json(new { Success = true, message = "Standard Talent Service" });
+        }        
+
         [HttpPost("createUpdateJob")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "employer, recruiter")]
         public IActionResult CreateUpdateJob([FromBody]Job jobData)
