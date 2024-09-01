@@ -150,6 +150,7 @@ namespace Talent.Common.Aws
         public async Task<string> GetStaticUrl(string name, string bucketName)
         {
             return string.Format("http://{0}.s3.amazonaws.com/{1}", bucketName, name);
+            //return string.Format("http://{0}.s3.ap-southeast-2.amazonaws.com/{1}", bucketName, name);
         }
 
         public async Task<bool> PutFileToS3(string name, Stream stream, string bucketName, bool isPublic=false)

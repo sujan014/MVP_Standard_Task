@@ -8,5 +8,6 @@ namespace Talent.Common.Aws
     {
         public string AwsAccessKey { get; set; }
         public string AwsSerectKey { get; set; }
+        
     }
 }

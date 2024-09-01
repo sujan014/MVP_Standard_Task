@@ -8,7 +8,7 @@ import { Description } from './Description.jsx';
 import { Toggle } from './Toggle.jsx';
 import AuthenticatingBanner from '../Layout/Banner/AuthenticatingBanner.jsx';
 import { LoggedInNavigation } from '../Layout/LoggedInNavigation.jsx';
-import { IndividualDetailSection, CompanyDetailSection } from './ContactDetail.jsx';
+import { IndividualDetailSection, CompanyDetailSection, EmployerDetailSection } from './ContactDetail.jsx';
 import { BodyWrapper, loaderData } from '../Layout/BodyWrapper.jsx';
 
 export default class EmployeeProfile extends React.Component {
@@ -52,7 +52,8 @@ export default class EmployeeProfile extends React.Component {
     loadData() {
         var cookies = Cookies.get('talentAuthToken');
         $.ajax({
-            url: 'http://localhost:60290/profile/profile/getEmployerProfile',
+            //url: 'http://localhost:60290/profile/profile/getEmployerProfile',
+            url: 'https://module1talent-cnfucbdcave3ccgq.australiaeast-01.azurewebsites.net/profile/profile/getEmployerProfile',
             headers: {
                 'Authorization': 'Bearer ' + cookies,
                 'Content-Type': 'application/json'
@@ -154,7 +155,8 @@ export default class EmployeeProfile extends React.Component {
 
         var cookies = Cookies.get('talentAuthToken');
         $.ajax({
-            url: 'http://localhost:60290/profile/profile/saveEmployerProfile',
+            //url: 'http://localhost:60290/profile/profile/saveEmployerProfile',
+            url: 'https://module1talent-cnfucbdcave3ccgq.australiaeast-01.azurewebsites.net/profile/profile/saveEmployerProfile',
             headers: {
                 'Authorization': 'Bearer ' + cookies,
                 'Content-Type': 'application/json'
@@ -190,7 +192,12 @@ export default class EmployeeProfile extends React.Component {
                                             title='Primary Contact Details'
                                             tooltip='Enter your primary contact details'
                                         >
-                                            <IndividualDetailSection
+                                            {/*<IndividualDetailSection*/}
+                                            {/*    controlFunc={this.updateForComponentId}*/}
+                                            {/*    details={this.state.employerData.primaryContact}*/}
+                                            {/*    componentId='primaryContact'*/}
+                                            {/*/>*/}
+                                            <EmployerDetailSection
                                                 controlFunc={this.updateForComponentId}
                                                 details={this.state.employerData.primaryContact}
                                                 componentId='primaryContact'

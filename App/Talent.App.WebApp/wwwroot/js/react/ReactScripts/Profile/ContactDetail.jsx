@@ -1,8 +1,151 @@
-﻿import React, { Component } from "react";
+﻿import React, { Component, useEffect, useState } from "react";
 import Cookies from 'js-cookie';
 import { ChildSingleInput } from '../Form/SingleInput.jsx';
 import { Location } from '../Employer/CreateJob/Location.jsx';
-export class IndividualDetailSection extends Component {
+
+export function IndividualDetailSection({ saveProfileData, details }) {
+    const [userDetails, setUserDetails] = useState(details);
+    const [edit, setEdit] = useState(false);
+    useEffect(() => {
+        setUserDetails(details);
+        //console.table(details);        
+    }, [details]);
+    const handleEdit = (e) => {
+        e.preventDefault();
+        setEdit(true);
+    }
+    const handleSaveDetails = (firstNameEdit, lastNameEdit, emailEdit, phoneEdit) => {        
+        //console.log(`${firstNameEdit}, ${lastNameEdit}, ${emailEdit}, ${phoneEdit}`);
+        const profileData = {
+            firstName: firstNameEdit,
+            lastName: lastNameEdit,
+            email: emailEdit,
+            phone: phoneEdit
+        }
+        saveProfileData(profileData);
+        setEdit(false);
+    }
+    const handleCancelEdit = () => {
+        setEdit(false);
+    }
+    
+    if (edit) {
+        return (
+            <EditDetail
+                userDetails={userDetails}
+                saveDetails={handleSaveDetails}
+                cancelEdit={handleCancelEdit}
+            />
+        )
+    }
+    else {
+        return (
+            <div className='row'>
+                <div className="ui sixteen wide column">
+                    <React.Fragment>
+                        <p>Name: {userDetails.firstName} {userDetails.lastName}</p>
+                        <p>Email: {userDetails.email}</p>
+                        <p>Phone: {userDetails.phone}</p>
+                    </React.Fragment>
+                    <button
+                        type="button"
+                        className="ui right floated teal button"
+                        onClick={handleEdit}
+                    >
+                        Edit
+                    </button>
+                </div>
+            </div>
+        )
+    }
+}
+
+function EditDetail({ userDetails, saveDetails, cancelEdit }) {
+    const [firstName, setFirstName] = useState(userDetails.firstName);
+    const [lastName, setLastName] = useState(userDetails.lastName);
+    const [email, setEmail] = useState(userDetails.email);
+    const [phone, setPhone] = useState(userDetails.phone);
+
+    const handleSave = (e) => {
+        e.preventDefault();
+        saveDetails(firstName, lastName, email, phone);
+    }
+    const handleFirstName = (e) => {
+        setFirstName(e.target.value);
+    }
+    const handleLastName = (e) => {
+        setLastName(e.target.value);
+    }
+    const handleEmail = (e) => {
+        setEmail(e.target.value);
+    }
+    const handlePhone = (e) => {
+        setPhone(e.target.value);
+    }
+    return (
+        <div className='ui sixteen wide column'>
+            <ChildSingleInput
+                inputType="text"
+                label="First Name"
+                name="firstName"
+                value={firstName}
+                controlFunc={handleFirstName}
+                maxLength={80}
+                placeholder="Enter your first name"
+                errorMessage="Please enter a valid first name"
+            />
+            <ChildSingleInput
+                inputType="text"
+                label="Last Name"
+                name="lastName"
+                value={lastName}
+                controlFunc={handleLastName}
+                maxLength={80}
+                placeholder="Enter your last name"
+                errorMessage="Please enter a valid last name"
+            />
+            <ChildSingleInput
+                inputType="text"
+                label="Email address"
+                name="email"
+                value={email}
+                controlFunc={handleEmail}
+                maxLength={80}
+                placeholder="Enter an email"
+                errorMessage="Please enter a valid email"
+            />
+
+            <ChildSingleInput
+                inputType="text"
+                label="Phone number"
+                name="phone"
+                value={phone}
+                controlFunc={handlePhone}
+                maxLength={12}
+                placeholder="Enter a phone number"
+                errorMessage="Please enter a valid phone number"
+            />
+
+            <button
+                type="button"
+                className="ui teal button"
+                onClick={handleSave}
+            >
+                Save
+            </button>
+            <button
+                type="button"
+                className="ui button"
+                onClick={cancelEdit}
+            >
+                Cancel
+            </button>
+        </div>
+    )    
+
+}
+
+export class EmployerDetailSection extends Component {
     constructor(props) {
         super(props)
 
@@ -109,8 +252,20 @@ export class IndividualDetailSection extends Component {
                     errorMessage="Please enter a valid phone number"
                 />
 
-                <button type="button" className="ui teal button" onClick={this.saveContact}>Save</button>
-                <button type="button" className="ui button" onClick={this.closeEdit}>Cancel</button>
+                <button
+                    type="button"
+                    className="ui teal button"
+                    onClick={this.saveContact}
+                >
+                    Save
+                </button>
+                <button
+                    type="button"
+                    className="ui button"
+                    onClick={this.closeEdit}
+                >
+                    Cancel
+                </button>
             </div>
         )
     }
@@ -135,7 +290,6 @@ export class IndividualDetailSection extends Component {
         )
     }
 }
-
 
 export class CompanyDetailSection extends Component {
     constructor(props) {

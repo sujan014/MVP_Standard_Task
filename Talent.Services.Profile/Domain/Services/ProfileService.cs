@@ -12,6 +12,11 @@ using Talent.Services.Profile.Models;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using Talent.Common.Security;
+using RawRabbit.Pipe.Middleware;
+using System.Reflection;
+using System.Numerics;
+using System.Xml.Linq;
+using StackExchange.Redis;
 
 namespace Talent.Services.Profile.Domain.Services
 {
@@ -43,22 +48,350 @@ namespace Talent.Services.Profile.Domain.Services
             _fileService = fileService;
         }
 
-        public bool AddNewLanguage(AddLanguageViewModel language)
+        public async Task<List<AddLanguageViewModel>> AddTalentLanguage(String Id, AddLanguageViewModel language) //public bool AddNewLanguage(AddLanguageViewModel language)
+        {            
+            User user = await _userRepository.GetByIdAsync(Id);
+            if (user != null)
+            {
+                var getLanguage = user.Languages.ToList();
+                getLanguage.Add(new UserLanguage
+                {
+                    Id = ObjectId.GenerateNewId().ToString(),
+                    UserId = user.Id,
+                    Language = language.Name,
+                    LanguageLevel = language.Level
+                });
+
+                user.Languages = getLanguage;
+                await _userRepository.Update(user);
+                var mappedLanguage = user.Languages.Select(x => ViewModelFromLanguage(x)).ToList();
+                return mappedLanguage;
+            }
+            return null;
+        }
+        
+        public async Task<List<AddLanguageViewModel>> UpdateTalentLanguage(String Id, AddLanguageViewModel language)
         {
-            //Your code here;
-            throw new NotImplementedException();
+            User user = await _userRepository.GetByIdAsync(Id);
+            if (user != null)
+            {
+                var getLanguage = user.Languages.ToList();
+                foreach (var lang in getLanguage)
+                {
+                    if (lang.Id == language.Id)
+                    {
+                        lang.Language = language.Name;
+                        lang.LanguageLevel = language.Level;
+                    }
+                }
+                user.Languages = getLanguage.ToList();
+                await _userRepository.Update(user);
+                var mappedLanguages = user.Languages.Select(x => ViewModelFromLanguage(x)).ToList();                
+                return mappedLanguages;
+            }
+            return null;
+        }
+        public async Task<List<AddLanguageViewModel>> DeleteTalentLanguage(String Id, AddLanguageViewModel language)
+        {
+            User user = await _userRepository.GetByIdAsync(Id);
+            if (user != null)
+            {
+                var getLanguage = user.Languages.ToList();
+                var delLang = user.Languages.FirstOrDefault(x => x.Id == language.Id);
+                getLanguage.Remove(delLang);
+                user.Languages = getLanguage.ToList();
+                await _userRepository.Update(user);
+                var mappedLanguages = user.Languages.Select(x => ViewModelFromLanguage(x)).ToList();
+                return mappedLanguages;                
+            }
+            return null;
+        }
+        public async Task<List<AddSkillViewModel>> AddTalentSkill(String Id, AddSkillViewModel skill)
+        {
+            User user = await _userRepository.GetByIdAsync(Id);
+            if (user != null)
+            {
+                var getSkills = user.Skills.ToList();
+                getSkills.Add(new UserSkill
+                {
+                    Id = ObjectId.GenerateNewId().ToString(),
+                    UserId = user.Id,
+                    Skill = skill.Name,
+                    ExperienceLevel = skill.Level
+                });
+                user.Skills = getSkills;
+                await _userRepository.Update(user);
+                var mappedSkills = user.Skills.Select(x => ViewModelFromSkill(x)).ToList();
+                return mappedSkills;
+            }
+            return null;
+        }
+        public async Task<List<AddSkillViewModel>> UpdateTalentSkill(String Id, AddSkillViewModel skill)
+        {
+            User user = await _userRepository.GetByIdAsync(Id);
+            if (user != null)
+            {
+                var getSkills = user.Skills.ToList();
+                foreach (var item in getSkills)
+                {
+                    if (item.Id == skill.Id)
+                    {
+                        item.Skill = skill.Name;
+                        item.ExperienceLevel = skill.Level;
+                    }
+                }
+                user.Skills = getSkills.ToList();
+                await _userRepository.Update(user);
+                var mappedSkills = user.Skills.Select(x => ViewModelFromSkill(x)).ToList();
+                return mappedSkills;
+            }
+            return null;
+        }
+        public async Task<List<AddSkillViewModel>> DeleteTalentSkill(String Id, AddSkillViewModel skill)
+        {
+            User user = await _userRepository.GetByIdAsync(Id);
+            if (user != null)
+            {
+                var getSkills = user.Skills.ToList();
+                var delSkill = getSkills.FirstOrDefault(x => x.Id == skill.Id);
+                getSkills.Remove(delSkill);
+                user.Skills = getSkills.ToList();
+                await _userRepository.Update(user);
+                var mappedSkills = user.Skills.Select(x => ViewModelFromSkill(x)).ToList();
+                return mappedSkills;
+            }
+            return null;
+        }
+        public async Task<List<ExperienceViewModel>> AddTalentExperience(String Id, ExperienceViewModel experience)
+        {
+            User user = await _userRepository.GetByIdAsync(Id);
+            if (user != null)
+            {
+                List<UserExperience> getExperience = user.Experience;
+                getExperience.Add(new UserExperience
+                {
+                    Id = ObjectId.GenerateNewId().ToString(),
+                    Company = experience.Company,
+                    Position = experience.Position,
+                    Responsibilities = experience.Responsibilities,
+                    Start = experience.Start,
+                    End = experience.End,
+                });
+                user.Experience = getExperience;
+                await _userRepository.Update(user);
+                var mappedExperience = user.Experience.Select(x => ViewModelFromExperience(x)).ToList();
+                return mappedExperience;
+            }
+            return null;
+        }
+        public async Task<List<ExperienceViewModel>> DeleteTalentExperience(String Id, ExperienceViewModel experience)
+        {
+            User user = await _userRepository.GetByIdAsync(Id);
+            if (user != null)
+            {
+                List<UserExperience> getExperience = user.Experience;
+                var deleteExper = getExperience.FirstOrDefault(x => x.Id == experience.Id);
+                getExperience.Remove(deleteExper);
+                user.Experience = getExperience;
+                await _userRepository.Update(user);
+                var mappedExperience = user.Experience.Select(x => ViewModelFromExperience(x)).ToList();
+                return mappedExperience;
+            }
+            return null;
+        }
+        public async Task<List<ExperienceViewModel>> UpdateTalentExperience(String Id, ExperienceViewModel model)
+        {
+            User user = await _userRepository.GetByIdAsync(Id);
+            if (user != null)
+            {
+                var getExperience = user.Experience;
+                foreach (var experience in getExperience)
+                {
+                    if (experience.Id == model.Id)
+                    {
+                        experience.Company = model.Company;
+                        experience.Position = model.Position;
+                        experience.Responsibilities = model.Responsibilities;
+                        experience.Start = model.Start;
+                        experience.End = model.End;
+                    }
+                }
+                user.Experience = getExperience;
+                await _userRepository.Update(user);
+                var mappedExperience = user.Experience.Select(x => ViewModelFromExperience(x)).ToList();
+                return mappedExperience;
+            }
+            return null;
+        }
+        public async Task<List<AddEducationViewModel>> AddTalentEducation(String Id, AddEducationViewModel educat)
+        {
+            User user = await _userRepository.GetByIdAsync(Id);
+            if (user != null)
+            {
+                var getEducation = user.Education;
+                getEducation.Add(new UserEducation
+                {
+                    Id = ObjectId.GenerateNewId().ToString(),
+                    UserId = user.Id,
+                    Country = educat.Country,
+                    InstituteName = educat.InstituteName,
+                    Title = educat.Title,
+                    Degree = educat.Degree,
+                    YearOfGraduation = educat.YearOfGraduation,
+                });
+                user.Education = getEducation;
+                await _userRepository.Update(user);
+                var mappedEducation = user.Education.Select(x => ViewModelFromEducation(x)).ToList();
+                return mappedEducation;
+            }
+            return null;
+        }
+        public async Task<List<AddEducationViewModel>> DeleteTalentEducation(String Id, AddEducationViewModel educat)
+        {
+            User user = await _userRepository.GetByIdAsync(Id);
+            if (user != null)
+            {
+                var getEducation = user.Education;
+                var deleteEducation = getEducation.FirstOrDefault(x => x.Id == educat.Id);
+                getEducation.Remove(deleteEducation);
+                user.Education = getEducation;
+                await _userRepository.Update(user);
+                var mappedEducation = user.Education.Select(x => ViewModelFromEducation(x)).ToList();
+                return mappedEducation;
+            }
+            return null;
+        }
+        public async Task<List<AddEducationViewModel>> UpdateTalentEducation(String Id, AddEducationViewModel educat)
+        {
+            User user = await _userRepository.GetByIdAsync(Id);
+            if (user != null)
+            {
+                var getEducation = user.Education;
+                foreach (var item in getEducation)
+                {
+                    if (item.Id == educat.Id)
+                    {
+                        item.Country = educat.Country;
+                        item.InstituteName = educat.InstituteName;
+                        item.Title = educat.Title;
+                        item.Degree = educat.Degree;
+                        item.YearOfGraduation = educat.YearOfGraduation;
+                    }
+                }
+                user.Education = getEducation;
+                await _userRepository.Update(user);
+                var mappedEducation = user.Education.Select(x => ViewModelFromEducation(x)).ToList();
+                return mappedEducation;
+            }
+            return null;
         }
 
         public async Task<TalentProfileViewModel> GetTalentProfile(string Id)
         {
             //Your code here;
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+
+            User profile = (await _userRepository.GetByIdAsync(Id));
+
+            var videoUrl = "";
+            var cvUrl = "";
+            if (profile != null)
+            {
+                var mappedLanguages = profile.Languages.Select(x => ViewModelFromLanguage(x)).ToList();
+                var mappedSkills = profile.Skills.Select(x => ViewModelFromSkill(x)).ToList();
+                var mappedEducation = profile.Education.Select(x => ViewModelFromEducation(x)).ToList();
+                var mappedCertification = profile.Certifications.Select(x => ViewModelFromCertification(x)).ToList();
+                var mappedExperience = profile.Experience.Select(x => ViewModelFromExperience(x)).ToList();
+
+                var result = new TalentProfileViewModel
+                {
+                    Id = profile.Id,
+                    FirstName = profile.FirstName,
+                    MiddleName = profile.MiddleName,
+                    LastName = profile.LastName,
+                    Gender = profile.Gender,
+                    Email = profile.Email,
+                    Phone = profile.Phone,
+                    MobilePhone = profile.MobilePhone,
+                    IsMobilePhoneVerified = profile.IsMobilePhoneVerified,
+                    Address = profile.Address,
+                    Nationality = profile.Nationality,
+                    VisaStatus = profile.VisaStatus,
+                    VisaExpiryDate = profile.VisaExpiryDate,
+                    ProfilePhoto = profile.ProfilePhoto,
+                    ProfilePhotoUrl = profile.ProfilePhotoUrl,
+                    VideoName = profile.VideoName,
+                    VideoUrl = videoUrl,// need to edit ???
+                    CvName = profile.CvName,
+                    CvUrl = cvUrl,  // need to edit ???
+                    Summary = profile.Summary,
+                    Description = profile.Description,
+                    LinkedAccounts = profile.LinkedAccounts,
+                    JobSeekingStatus = profile.JobSeekingStatus,
+                    Languages = mappedLanguages,
+                    Skills = mappedSkills,
+                    Education = mappedEducation,
+                    Certifications = mappedCertification,
+                    Experience = mappedExperience
+                };
+                return result;
+            }
+            return null;
         }
 
         public async Task<bool> UpdateTalentProfile(TalentProfileViewModel model, string updaterId)
         {
             //Your code here;
-            throw new NotImplementedException();
+            //throw new NotImplementedException();            
+            try
+            {
+                if (model.Id != null)
+                {
+                    User existingUser = await _userRepository.GetByIdAsync(model.Id);
+                    existingUser.FirstName = model.FirstName;
+                    existingUser.LastName = model.LastName;
+                    existingUser.Email = model.Email;
+                    existingUser.Phone = model.Phone;
+                    existingUser.LinkedAccounts = model.LinkedAccounts;
+                    existingUser.Address = model.Address;
+                    existingUser.Nationality = model.Nationality;
+                    existingUser.Summary = model.Summary;
+                    existingUser.Description = model.Description;
+                    existingUser.VisaStatus = model.VisaStatus;
+                    existingUser.VisaExpiryDate = model.VisaExpiryDate;
+                    existingUser.JobSeekingStatus = model.JobSeekingStatus;
+
+                    //existingUser.Languages = model.Languages.Select(x => new UserLanguage {
+                    //    Id = ObjectId.GenerateNewId().ToString(),                        
+                    //    UserId = model.Id,
+                    //    Language = x.Name,
+                    //    LanguageLevel = x.Level
+                    //}).ToList();                    
+                    //existingUser.Skills = model.Skills.Select(x => new UserSkill
+                    //{
+                    //    Id = ObjectId.GenerateNewId().ToString(),
+                    //    UserId = model.Id,
+                    //    Skill = x.Name,
+                    //    ExperienceLevel = x.Level
+                    //}).ToList();
+                    //existingUser.Education = model.Education.Select(x => new UserEducation
+                    //{
+                    //    Id = ObjectId.GenerateNewId().ToString(),
+                    //    UserId = model.Id,
+                    //    Country = x.Country,
+                    //    InstituteName = x.InstituteName,
+                    //    Title = x.Title,
+                    //    Degree = x.Degree,
+                    //    YearOfGraduation = x.YearOfGraduation,
+                    //}).ToList();
+                    await _userRepository.Update(existingUser);
+                }                
+            }
+            catch (MongoException ex)
+            {
+                return false;
+            }
+            return true;
         }
 
         public async Task<EmployerProfileViewModel> GetEmployerProfile(string Id, string role)
@@ -66,6 +399,8 @@ namespace Talent.Services.Profile.Domain.Services
 
             Employer profile = null;
             switch (role)
+
+
             {
                 case "employer":
                     profile = (await _employerRepository.GetByIdAsync(Id));
@@ -229,7 +564,30 @@ namespace Talent.Services.Profile.Domain.Services
         public async Task<bool> UpdateTalentPhoto(string talentId, IFormFile file)
         {
             //Your code here;
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            var fileExtension = Path.GetExtension(file.FileName);
+            List<string> acceptedExtensions = new List<string> { ".jpg", ".png", ".gif", ".jpeg" };
+            if (fileExtension != null && !acceptedExtensions.Contains(fileExtension)){
+                return false;
+            }
+            var talentProfile = await _userRepository.GetByIdAsync(talentId);
+            if (talentProfile == null) { 
+                return false; 
+            }
+            var newFileName = await _fileService.SaveFile(file, FileType.ProfilePhoto);
+            if (!string.IsNullOrWhiteSpace(newFileName))
+            {
+                var oldFileName = talentProfile.ProfilePhoto;
+                if (!string.IsNullOrWhiteSpace(oldFileName))
+                {
+                    await _fileService.DeleteFile(oldFileName, FileType.ProfilePhoto);
+                }
+                talentProfile.ProfilePhoto = newFileName;
+                talentProfile.ProfilePhotoUrl = await _fileService.GetFileURL(newFileName, FileType.ProfilePhoto);
+                await _userRepository.Update(talentProfile);
+                return true;
+            }
+            return false;
         }
 
         public async Task<bool> AddTalentVideo(string talentId, IFormFile file)
@@ -259,8 +617,10 @@ namespace Talent.Services.Profile.Domain.Services
 
         public async Task<IEnumerable<TalentSnapshotViewModel>> GetTalentSnapshotList(string employerOrJobId, bool forJob, int position, int increment)
         {
+            List<TalentSnapshotViewModel> lists = new List<TalentSnapshotViewModel>();
+            return lists;
             //Your code here;
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         public async Task<IEnumerable<TalentSnapshotViewModel>> GetTalentSnapshotList(IEnumerable<string> ids)
@@ -333,6 +693,50 @@ namespace Talent.Services.Profile.Domain.Services
             };
         }
 
+        protected AddLanguageViewModel ViewModelFromLanguage(UserLanguage language)
+        {
+            return new AddLanguageViewModel
+            {
+                Id = language.Id,
+                CurrentUserId = language.UserId,
+                Name = language.Language,
+                Level = language.LanguageLevel,
+            };
+        }
+        protected AddEducationViewModel ViewModelFromEducation(UserEducation education)
+        {
+            return new AddEducationViewModel
+            {
+                Id = education.Id,
+                Country = education.Country,
+                InstituteName = education.InstituteName,
+                Title = education.Title,
+                Degree = education.Degree,
+                YearOfGraduation = education.YearOfGraduation,
+            };
+        }
+        protected AddCertificationViewModel ViewModelFromCertification(UserCertification certification)
+        {
+            return new AddCertificationViewModel
+            {
+                Id = certification.Id,
+                CertificationName = certification.CertificationName,
+                CertificationFrom = certification.CertificationFrom,
+                CertificationYear = certification.CertificationYear,
+            };
+        }
+        protected ExperienceViewModel ViewModelFromExperience(UserExperience experience)
+        {
+            return new ExperienceViewModel 
+            {
+                Id = experience.Id,
+                Company = experience.Company,
+                Position = experience.Position,
+                Responsibilities = experience.Responsibilities,
+                Start = experience.Start,
+                End = experience.End,
+            };
+        }
         #endregion
 
         #endregion

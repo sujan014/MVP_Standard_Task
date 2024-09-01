@@ -12,3 +12,11 @@
 
 # Ignore personal files
 **/*.user
+
+# Ignore all appsettings.json
+Talent.Services.Profile/appsettings.json
+App/Talent.App.WebApp/appsettings.json
+
+# ignore publish profiles:
+**/PublishProfiles/
+**/dist/
