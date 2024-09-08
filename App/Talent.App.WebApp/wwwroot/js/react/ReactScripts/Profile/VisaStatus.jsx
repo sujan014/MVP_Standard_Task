@@ -41,7 +41,7 @@ export default function VisaStatus({ visaStatus, visaExpiryDate, updateProfileDa
     }
     useEffect(
         () => {
-            setVisa(visa);
+            setVisa(visaStatus);
             setVisaExpiry(moment(visaExpiryDate));
             checkVisa(visaStatus);
         }, [visaStatus, visaExpiryDate]
