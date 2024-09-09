@@ -22,6 +22,7 @@ export default function TalentStatus({ status, updateProfileData, saveProfileDat
     const onOptionSelect = (e) => {
         //e.preventDefault();        
         checkStatus = e.target.value;
+        console.log("status: "+ e.target.value);
         setJobStatus(e.target.value);
     }
     const handleSaveJobStatus = (e) => {
@@ -65,7 +66,7 @@ export default function TalentStatus({ status, updateProfileData, saveProfileDat
                             />
                         </div>
                         <div className='fifteen wide column'>
-                            <label htmlFor='Active'>Not looking for a job at the moment</label>
+                            <label htmlFor='Inactive'>Not looking for a job at the moment</label>
                         </div>
                     </div>
                     <div className='ui grid'>
@@ -80,7 +81,7 @@ export default function TalentStatus({ status, updateProfileData, saveProfileDat
                             />
                         </div>
                         <div className='fifteen wide column'>
-                            <label htmlFor='Active'>Currently employed but open to offers</label>
+                            <label htmlFor='Open'>Currently employed but open to offers</label>
                         </div>
                     </div>
                     <div className='ui grid'>
@@ -95,7 +96,7 @@ export default function TalentStatus({ status, updateProfileData, saveProfileDat
                             />
                         </div>
                         <div className='fifteen wide column'>
-                            <label htmlFor='Active'>Will be available on later date</label>
+                            <label htmlFor='Closed'>Will be available on later date</label>
                         </div>
                     </div>
                 </div>
