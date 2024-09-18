@@ -3,20 +3,28 @@ import ReactPlayer from 'react-player';
 import PropTypes from 'prop-types'
 import { Popup, Icon, CardContent, CardHeader, CardDescription, Card, CardMeta, GridRow, GridColumn, Grid } from 'semantic-ui-react'
 
-export default function TalentCard({ talentData }) {    
+export default function TalentCard({ talentData }) {
     //console.table(talentData);
     const [video, setVideo] = useState(true);
+    const [profilePic, setProfilePic] = useState(talentData.photoId);
+    useEffect(() => {        
+        if (!talentData.photoId) {
+            setProfilePic("https://react.semantic-ui.com/images/avatar/large/matthew.png");
+        }
+    }, [talentData])
+
     const handleVideo = (event, state) => {
         event.preventDefault();
         setVideo(state);
     }
+    //console.log('talentData');console.log(talentData);
 
     return (
         <div className='ui fluid card'>
-            <div className='content'>                
-                <div className='header'>    
-                    {talentData.name}                                            
-                    <Icon name='star' className='right floated' />                                                    
+            <div className='content'>
+                <div className='header'>
+                    {talentData.name}
+                    <Icon name='star' className='right floated' />
                 </div>
                 <div className='description'>
                     {video ?
@@ -27,16 +35,16 @@ export default function TalentCard({ talentData }) {
                         </div> :
                         <Grid columns={2} divided>
                             <GridRow>
-                                <GridColumn>                                
+                                <GridColumn>
                                     <img
-                                        src="https://react.semantic-ui.com/images/avatar/large/matthew.png"
+                                        src={profilePic}
                                         style={{
                                             maxWidth: "250px",
                                             maxHeight: "300px",
                                             width: 'auto',
                                             height: 'auto'
                                         }}
-                                    />                                    
+                                    />
                                 </GridColumn>
                                 <GridColumn> {/*<div className='column'>*/}
                                     <p><strong>CURRENT EMPLOYER</strong></p>
@@ -50,7 +58,7 @@ export default function TalentCard({ talentData }) {
                             </GridRow>
                         </Grid>
                     }
-                    <div className='ui grid'>                    
+                    <div className='ui grid'>
                         <div className='4 wide column'>
                             {video ?
                                 <Icon
@@ -71,22 +79,53 @@ export default function TalentCard({ talentData }) {
                         </div>
                         <div className='4 wide column'>
                             <Icon name='github' />
-                        </div>                        
+                        </div>
                     </div>
                     <div className='ui divider'></div>
                     <div>
                         {talentData.skills.map((skillName, index) => (
                             <button
-                                key={index }
+                                key={index}
                                 className='ui blue basic button'
                             >
                                 {skillName}
                             </button>
                         ))}
                     </div>
-                </div>                    
+                </div>
             </div>
         </div>
-    )    
+    )
+    return (
+        <Card fluid>
+            <CardContent>
+                <CardHeader>
+                    {talentData.name}
+                    <Icon name='star' className='right floated' />
+                </CardHeader>
+
+                <CardDescription>
+                    <video preload="auto" controls>
+                        Your browser doesn't support HTML 5.
+                    </video>
+                    <div>
+                        {video ?
+                            <Icon
+                                name='user'
+                                onClick={(event) => handleVideo(event, false)}
+                            /> :
+                            <Icon
+                                name='video'
+                                onClick={(event) => handleVideo(event, true)}
+                            />
+                        }
+                        <Icon name='file pdf outline' />
+                        <Icon name='linkedin in' />
+                        <Icon name='github' />
+                    </div>
+                </CardDescription>
+            </CardContent>
+        </Card>
+    )
 }
 

@@ -39,10 +39,8 @@ export default function CompanyProfile() {
             )
             .then((response) => {
                 if (response.status === 200) {
-                    console.log('Employer Response: ');
-                    console.log(response);
-                    console.log('Employer Response data: ');
-                    console.log(response.data.employer);
+                    //console.log('Employer Response: ');console.log(response);
+                    //console.log('Employer Response data: ');console.log(response.data.employer);
                     setEmployerData(response.data.employer);
                     setDataLoad(true);
                 }

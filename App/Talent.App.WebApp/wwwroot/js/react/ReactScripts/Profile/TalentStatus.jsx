@@ -21,8 +21,7 @@ export default function TalentStatus({ status, updateProfileData, saveProfileDat
 
     const onOptionSelect = (e) => {
         //e.preventDefault();        
-        checkStatus = e.target.value;
-        console.log("status: "+ e.target.value);
+        checkStatus = e.target.value;        
         setJobStatus(e.target.value);
     }
     const handleSaveJobStatus = (e) => {

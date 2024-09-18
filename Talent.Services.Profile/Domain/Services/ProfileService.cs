@@ -617,8 +617,39 @@ namespace Talent.Services.Profile.Domain.Services
 
         public async Task<IEnumerable<TalentSnapshotViewModel>> GetTalentSnapshotList(string employerOrJobId, bool forJob, int position, int increment)
         {
-            List<TalentSnapshotViewModel> lists = new List<TalentSnapshotViewModel>();
-            return lists;
+            try
+            {
+                IQueryable<User> query = _userRepository.GetQueryable();
+                query = query.Where(u => !u.IsDeleted);
+                query = query.OrderByDescending(u => u.CreatedOn);
+                query = query.Take(increment);
+                IEnumerable<User> users = query.ToList();
+                var talentSnapshots = users.Select(user =>
+                {
+                    var currentEmployment = "MVP Studio";
+                    var level = "Internship";
+                    var skills = user.Skills?.Select(skill => skill.Skill).ToList() ?? new List<string>();
+                    return new TalentSnapshotViewModel
+                    {
+                        Id = user.Id,
+                        Name = $"{user.FirstName} {user.LastName}",
+                        PhotoId = user.ProfilePhotoUrl,
+                        VideoUrl = user.VideoName,
+                        CVUrl = user.CvName,
+                        Summary = user.Summary,
+                        Visa = user.VisaStatus,
+                        CurrentEmployment = currentEmployment,
+                        Level = level,
+                        Skills = skills
+                    };
+                }).ToList();
+                return talentSnapshots;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
             //Your code here;
             //throw new NotImplementedException();
         }
